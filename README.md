@@ -17,12 +17,14 @@
 # Database (Docker)
 docker run --name mysql -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d mysql:8.0
 
+# Global Tools
+dotnet tool install --global dotnet-ef
+npm install -g @tailwindcss/cli
+
 # Backend (.NET)
 cd apps/api
-dotnet tool install --global dotnet-ef
 dotnet restore
 dotnet ef database update
-npm install -g @tailwindcss/cli
 npm install
 
 # Frontend (Next.js)
