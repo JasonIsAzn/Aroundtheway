@@ -1,6 +1,6 @@
 # Aroundtheway — 🚀 Full‑Stack .NET + Next.js + MySQL + Tailwind
 
-- **.NET 8**
+- **.NET 9**
 - **Next.js**
 - **MySQL (Docker)**
 - **TailwindCSS**
