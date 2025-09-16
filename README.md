@@ -1,10 +1,9 @@
 # Aroundtheway — 🚀 Full‑Stack .NET + Next.js + MySQL + Tailwind
 
 - **.NET 8**
-- **Next.js (App Router)**
+- **Next.js**
 - **MySQL (Docker)**
 - **TailwindCSS**
-- **Next.js**---
 
 ## 📦 Requirements
 
