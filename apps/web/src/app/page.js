@@ -6,6 +6,21 @@ export default function Home() {
       <h1 className="text-2xl font-semibold">Aroundtheway</h1>
       <ul className="list-disc pl-5 space-y-2">
         <li>
+          <Link className="underline" href="/login">
+            User Login
+          </Link>
+        </li>
+        <li>
+          <Link className="underline" href="/register">
+            User Registration
+          </Link>
+        </li>
+        <li>
+          <Link className="underline" href="/verify-email">
+            Email Verification
+          </Link>
+        </li>
+        <li>
           <Link className="underline" href="/server-playground">
             Server-side fetch playground
           </Link>
