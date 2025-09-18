@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Aroundtheway.Api.Data;
 using MySqlConnector;
+using Aroundtheway.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
+builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
+
 
 var connectionString = builder.Configuration.GetConnectionString("defaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
