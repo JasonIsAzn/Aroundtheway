@@ -13,7 +13,7 @@ builder.Services.AddSession(options =>
     options.Cookie.Name = "Aroundtheway.Session";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
 
