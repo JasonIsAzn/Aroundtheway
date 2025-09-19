@@ -86,7 +86,13 @@ public class AuthController : Controller
         if (user is null)
         {
             ModelState.AddModelError("", "Invalid email or password.");
-            return View("Login", vm);
+            return View("../Account/Login", vm);
+        }
+
+        if (!user.IsAdmin)
+        {
+            ModelState.AddModelError("", "You are not an admin.");
+            return View("../Account/Login", vm);
         }
 
         // Create claims
@@ -95,7 +101,7 @@ public class AuthController : Controller
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Email),
             new(ClaimTypes.Email, user.Email),
-            new("role", user.IsAdmin ? "admin" : "user")
+            new("role", "admin")
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
