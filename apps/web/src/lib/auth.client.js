@@ -33,7 +33,6 @@ export async function logout() {
 export async function getMe() {
   const res = await apiFetch("/api/auth/me", {
     method: "GET",
-    credentials: "include",
   });
   return res.json();
 }
