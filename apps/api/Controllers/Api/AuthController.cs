@@ -48,23 +48,6 @@ public class AuthController : Controller
         return Created($"/api/users/{user.Id}", new RegisterResponse(user.Id, user.Email, user.IsAdmin));
     }
 
-    [HttpPost("register")]
-    [Consumes("application/x-www-form-urlencoded")]
-    public async Task<IActionResult> RegisterWeb([FromForm] RegisterFormViewModel vm)
-    {
-        vm.Email = (vm.Email ?? "").Trim().ToLowerInvariant();
-        vm.Password = (vm.Password ?? "").Trim();
-        vm.ConfirmPassword = (vm.ConfirmPassword ?? "").Trim();
-
-        if (!ModelState.IsValid) return Problem("Invalid form data");
-
-        var user = await HandleRegister(vm.Email, vm.Password);
-
-        HttpContext.Session.SetInt32("SessionUserId", user.Id);
-
-        return RedirectToAction("Index", "Home");
-    }
-
     private async Task<User> HandleRegister(string email, string password)
     {
         var hashed = _passwordService.Hash(password);
@@ -74,7 +57,6 @@ public class AuthController : Controller
         await _context.SaveChangesAsync();
         return user;
     }
-
 
     [HttpPost("login")]
     [Consumes("application/json")]
