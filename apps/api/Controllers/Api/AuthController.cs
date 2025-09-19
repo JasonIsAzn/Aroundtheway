@@ -81,7 +81,7 @@ public class AuthController : Controller
         var password = (dto.Password ?? "").Trim();
 
         var user = await HandleLogin(email, password);
-        if (user is null) return Unauthorized();
+        if (user is null) return Unauthorized(new { message = "Invalid email or password." });
 
         HttpContext.Session.SetInt32("SessionUserId", user.Id);
 
