@@ -29,6 +29,15 @@ public class AuthController : Controller
         var email = (dto.Email ?? "").Trim().ToLowerInvariant();
         var password = (dto.Password ?? "").Trim();
 
+
+        if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == email))
+            return Conflict(new ProblemDetails
+            {
+                Title = "Email already in use",
+                Status = StatusCodes.Status409Conflict
+            });
+
+
         var user = await HandleRegister(email, password);
 
         HttpContext.Session.SetInt32("SessionUserId", user.Id);
