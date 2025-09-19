@@ -121,5 +121,22 @@ public class AuthController : Controller
         return user;
     }
 
+    [HttpGet("me")]
+    public IActionResult Me()
+    {
+        var userId = HttpContext.Session.GetInt32("SessionUserId");
+        if (userId == null) return Unauthorized();
 
+        var user = _context.Users.Find(userId.Value);
+        if (user == null) return Unauthorized();
+
+        return Ok(new
+        {
+            user.Id,
+            user.Email,
+            user.IsAdmin,
+            user.CreatedAt,
+            user.UpdatedAt
+        });
+    }
 }

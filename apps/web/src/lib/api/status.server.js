@@ -1,12 +1,5 @@
 import "server-only";
-import { headers } from "next/headers";
-
-async function getBaseUrl() {
-  const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  return `${proto}://${host}`;
-}
+import { getBaseUrl } from "../http.server";
 
 export async function getStatus() {
   const base = await getBaseUrl();
