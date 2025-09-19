@@ -1,8 +1,55 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    var currentUser = ViewBag.CurrentUser as Aroundtheway.Api.Models.User;
 }
 
-<div>
-    <h1 class="text-3xl font-bold underline">Welcome</h1>
-    <a href="/api/status/db" class="underline">DB Ping</a>
+<div class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">🛠️ Dev Debug Area</h1>
+
+    @if (currentUser != null)
+    {
+        <div class="mb-6 p-4 bg-green-100 border border-green-300 rounded-lg shadow w-full max-w-md">
+            <h2 class="text-xl font-semibold text-green-800 mb-2">✅ Logged In User</h2>
+            <ul class="text-sm text-green-700 space-y-1">
+                <li><strong>ID:</strong> @currentUser.Id</li>
+                <li><strong>Email:</strong> @currentUser.Email</li>
+                <li><strong>CreatedAt:</strong> @currentUser.CreatedAt</li>
+                <li><strong>UpdatedAt:</strong> @currentUser.UpdatedAt</li>
+                <li><strong>IsAdmin:</strong> @currentUser.IsAdmin</li>
+                <li><strong>Address:</strong> @currentUser.Address</li>
+                <li><strong>CreditCard:</strong> @currentUser.CreditCard</li>
+            </ul>
+
+            <form method="post" action="/api/auth/logout" class="mt-4">
+                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">
+                    Logout
+                </button>
+            </form>
+        </div>
+    }
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
+        <a href="/api/status/db"
+            class="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-blue-500 transition">
+            <p class="text-lg font-semibold text-gray-700">DB Ping</p>
+            <p class="text-sm text-gray-500">Test database connection</p>
+        </a>
+
+        <a href="/account/login"
+            class="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-green-500 transition">
+            <p class="text-lg font-semibold text-gray-700">Login Page</p>
+            <p class="text-sm text-gray-500">Go to login form</p>
+        </a>
+
+        <a href="/account/register"
+            class="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-purple-500 transition">
+            <p class="text-lg font-semibold text-gray-700">Register Page</p>
+            <p class="text-sm text-gray-500">Go to register form</p>
+        </a>
+
+        <a href="/user"
+            class="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-red-500 transition">
+            <p class="text-lg font-semibold text-gray-700">View Users</p>
+            <p class="text-sm text-gray-500">GET /user</p>
+        </a>
+    </div>
 </div>

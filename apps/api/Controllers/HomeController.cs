@@ -1,20 +1,30 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Aroundtheway.Api.Models;
+using Aroundtheway.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aroundtheway.Api.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly AppDbContext _context;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(AppDbContext context)
     {
-        _logger = logger;
+        _context = context;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        var userId = HttpContext.Session.GetInt32("SessionUserId");
+
+        if (userId != null)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
+            ViewBag.CurrentUser = user;
+        }
+        ViewData["Title"] = "Home Page";
         return View();
     }
 
