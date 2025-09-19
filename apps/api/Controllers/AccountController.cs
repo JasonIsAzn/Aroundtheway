@@ -31,5 +31,12 @@ public class AccountController : Controller
         ViewData["Title"] = "Login";
         return View(new LoginFormViewModel { Error = error });
     }
+
+    [HttpGet("logout")]
+    public IActionResult Logout()
+    {
+        ViewData["Title"] = "Logout";
+        return View();
+    }
 }
 
