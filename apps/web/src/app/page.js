@@ -43,15 +43,27 @@ export default async function Home() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
         <Link
-          href="/api/status/db"
+          href="/client-playground"
           className="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-blue-500 transition"
         >
-          <p className="text-lg font-semibold text-gray-700">DB Ping</p>
-          <p className="text-sm text-gray-500">Test database connection</p>
+          <p className="text-lg font-semibold text-gray-700">
+            Client Playground
+          </p>
+          <p className="text-sm text-gray-500">Test Connection</p>
         </Link>
 
         <Link
-          href="/login"
+          href="/server-playground"
+          className="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-blue-500 transition"
+        >
+          <p className="text-lg font-semibold text-gray-700">
+            Server Playground
+          </p>
+          <p className="text-sm text-gray-500">Test Connection</p>
+        </Link>
+
+        <Link
+          href="/test-login"
           className="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-green-500 transition"
         >
           <p className="text-lg font-semibold text-gray-700">Login Page</p>
@@ -59,19 +71,11 @@ export default async function Home() {
         </Link>
 
         <Link
-          href="/register"
+          href="/test-register"
           className="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-purple-500 transition"
         >
           <p className="text-lg font-semibold text-gray-700">Register Page</p>
           <p className="text-sm text-gray-500">Go to register form</p>
-        </Link>
-
-        <Link
-          href="/user"
-          className="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-red-500 transition"
-        >
-          <p className="text-lg font-semibold text-gray-700">View Users</p>
-          <p className="text-sm text-gray-500">GET /user</p>
         </Link>
       </div>
     </main>
