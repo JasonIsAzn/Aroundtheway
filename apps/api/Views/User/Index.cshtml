@@ -1,0 +1,13 @@
+@using Aroundtheway.Api.ViewModels.Users
+@model UsersViewModel
+
+
+Users
+@foreach (var user in Model.Users)
+{
+    <p>@user.Id</p>
+    <p>@user.Email</p>
+    <p>@user.CreatedAt</p>
+    <p>@user.UpdatedAt</p>
+    <p>@user.PasswordHash</p>
+}
