@@ -19,15 +19,11 @@ export async function login({ email, password }) {
 }
 
 export async function logout() {
-  const res = await fetch("/api/auth/logout", {
+  await apiFetch("/api/auth/logout", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
   });
-
-  if (!res.ok) {
-    throw new Error("Logout failed");
-  }
 }
 
 export async function getMe() {
