@@ -2,17 +2,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Aroundtheway.Api.Dtos.Auth;
 
-public record RegisterRequest(
-    [property: Required(ErrorMessage = "Please enter your email.")]
-    [property: EmailAddress(ErrorMessage = "Please enter a valid email.")]
-    string Email,
+public record class RegisterRequest
+{
+    [Required(ErrorMessage = "Please enter your email.")]
+    [EmailAddress(ErrorMessage = "Please enter a valid email.")]
+    public string Email { get; init; } = string.Empty;
 
-    [property: DataType(DataType.Password)]
-    [property: Required(ErrorMessage = "Please enter your password.")]
-    [property: MinLength(8, ErrorMessage = "Password must be at least 8 characters long.")]
-    [property: RegularExpression(
-        @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$",
-        ErrorMessage = "Password must be at least 8 characters long and contain one uppercase letter, one lowercase letter, and one number."
-    )]
-    string Password
-);
+    [Required(ErrorMessage = "Please enter your password.")]
+    [MinLength(8, ErrorMessage = "Password must be at least 8 characters.")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$",
+        ErrorMessage = "Password must contain upper, lower, and a number.")]
+    public string Password { get; init; } = string.Empty;
+}
