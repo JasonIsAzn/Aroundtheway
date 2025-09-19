@@ -39,7 +39,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapStaticAssets();
+app.UseStaticFiles();
 
 
 app.MapGet("/dbping", async () =>
@@ -54,8 +54,7 @@ app.MapGet("/dbping", async () =>
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 app.Run();
