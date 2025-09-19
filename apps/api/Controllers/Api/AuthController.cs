@@ -1,8 +1,11 @@
+using System.Security.Claims;
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Dtos.Auth;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.Services;
 using Aroundtheway.Api.ViewModels.Account;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -104,6 +107,26 @@ public class AuthController : Controller
             return View("Login", vm);
         }
 
+        // Create claims
+        var claims = new List<Claim>
+    {
+        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new(ClaimTypes.Name, user.Email),
+        new(ClaimTypes.Email, user.Email),
+        new("role", user.IsAdmin ? "admin" : "user")
+    };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        var props = new AuthenticationProperties
+        {
+            IsPersistent = true,
+            AllowRefresh = true,
+        };
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+
         HttpContext.Session.SetInt32("SessionUserId", user.Id);
 
         return RedirectToAction("Index", "Home");
@@ -151,10 +174,10 @@ public class AuthController : Controller
 
     [HttpPost("logout")]
     [Consumes("application/json")]
-    public IActionResult LogoutApi()
+    public async Task<IActionResult> LogoutApi()
     {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         HttpContext.Session.Clear();
-
         return Ok(new { message = "Logged out successfully" });
     }
 
