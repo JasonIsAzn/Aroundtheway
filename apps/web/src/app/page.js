@@ -65,7 +65,7 @@ export default async function Home() {
         </Link>
 
         <Link
-          href="/test-login"
+          href="/login"
           className="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-green-500 transition"
         >
           <p className="text-lg font-semibold text-gray-700">Login Page</p>
@@ -73,7 +73,7 @@ export default async function Home() {
         </Link>
 
         <Link
-          href="/test-register"
+          href="/register"
           className="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-purple-500 transition"
         >
           <p className="text-lg font-semibold text-gray-700">Register Page</p>
