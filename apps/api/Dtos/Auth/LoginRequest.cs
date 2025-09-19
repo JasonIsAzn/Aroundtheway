@@ -2,12 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Aroundtheway.Api.Dtos.Auth;
 
-public record LoginRequest(
-    [property: Required(ErrorMessage = "Please enter email.")]
-    [property: EmailAddress(ErrorMessage = "Please enter a valid email address.")]
-    string Email,
+public record class LoginRequest
+{
+    [Required(ErrorMessage = "Please enter email.")]
+    [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
+    public string Email { get; init; } = string.Empty;
 
-    [property: DataType(DataType.Password)]
-    [property: Required(ErrorMessage = "Please enter password.")]
-    string Password
-);
+    [DataType(DataType.Password)]
+    [Required(ErrorMessage = "Please enter password.")]
+    public string Password { get; init; } = string.Empty;
+}
