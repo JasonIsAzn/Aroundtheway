@@ -1,0 +1,197 @@
+html, body 
+{
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.container
+{
+    background-color: white;
+
+    position: sticky;
+    display: flex;
+    align-items: center;
+    height: 4.5rem;
+
+    padding-left: .5rem;
+    padding-right: 2rem;
+
+    border-bottom: 1px solid black;
+
+    position: relative;  /* required for z-index to work */
+    z-index: 1000;    
+}
+.image
+{
+    height: 3rem; 
+    width: auto;      
+    max-width: 5rem;      
+    display: block;
+    object-fit: contain; 
+}
+.navBarContainer
+{
+
+    flex:1;
+    margin-left: 3rem;
+    align-self: center;
+}
+.navBar
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2rem;
+
+    list-style: none;
+    margin: 0;
+    transition: color 0.2s ease, border-bottom 0.2s ease;
+}
+.navBar a
+{
+    text-decoration: none;
+    color: black;
+    letter-spacing: -1px;
+    font-size: 12px;
+
+}
+
+.navBar a:hover{
+  font-weight: bold;
+}
+
+.navFooter a
+{
+    text-decoration: none;
+    color: black;
+    letter-spacing: -1px;
+    font-size: 12px;
+}
+.navFooter
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2rem;
+
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.bagButton
+{
+    border: none;
+    cursor: pointer;
+    /* background-color: aquamarine; */
+}
+/* --- Dropdowns --- */
+.hasDropdown 
+{
+    position: relative;            /* anchor for absolute submenu */
+
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;                /* space between word and caret (works because <a> is flex) */  
+}
+  
+.dropdown {
+    position: absolute;
+    top: 100%;
+    display: none;
+    flex-direction: row;   /* keep horizontal */
+    gap: 2rem;
+
+    list-style: none;
+    margin: 0;
+    padding: 0.25rem 1rem;
+    background-color: white;
+    border-radius: 4px;
+    min-width: 14rem;
+
+    align-items: flex-start;   /* aligns text vertically with nav bar */
+}
+
+.dropdown a {
+    text-decoration: none;
+    color: black;
+    letter-spacing: -0.5px;    /* removes bold */
+    line-height: 1.5;         /* makes vertical alignment cleaner */
+    display: flex;
+    align-items: center;      /* centers the text vertically inside each <a> */
+    gap: 2rem;
+    display: flex;
+    flex-direction: row; /* horizontal */
+    gap: 2rem;  
+    position: relative;
+    font-size: 12px;
+}
+.hasDropdown > a {
+  display: inline-flex;        /* turn the link into a flexbox */
+  align-items: center;         /* vertically center text + arrow */
+  gap: .5rem;                 /* space between word and arrow */
+}
+.dropdown a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0px;                /* slightly below text */
+  width: 0;
+  height: 2px;
+  background: black;    /* matches text color */
+  transition: width 0.3s ease;
+}
+
+.dropdown a:hover::after {
+  width: 100%;                 /* expands underline on hover */
+}
+
+.hasDropdown > a::after {
+  content: "";
+  display: inline-block;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 300ms ease;
+
+  position: relative;
+  top: -2px;   /* move it up slightly */
+    margin-left: 0.4rem;   
+}
+.hasDropdown:hover > a::after,
+.hasDropdown:focus-within > a::after {
+  transform: rotate(45deg);               /* down arrow */
+}
+
+
+  
+  /* show on hover/focus */
+.hasDropdown:hover .dropdown,
+.hasDropdown:focus-within .dropdown 
+{
+    display: flex;
+}
+  
+  /* keep hover target generous on top-level links */
+.navBar > li > a 
+{
+    display: inline-block;
+}
+  
+  /* small touch: prevent submenu from hugging page edge on small screens */
+@media (max-width: 640px) 
+{
+    .dropdown 
+    {
+      left: -0.5rem;
+      right: auto;
+    }
+}
+.hasDropdown .dropdown 
+{
+    left: -1rem; /* adjust until aligned exactly */
+}  
