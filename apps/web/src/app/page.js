@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getMeServer } from "@/lib/auth.server";
+import LogoutButton from "./components/LogoutButton";
 
 export default async function Home() {
   const user = await getMeServer();
@@ -38,6 +39,7 @@ export default async function Home() {
               <strong>CreditCard:</strong> {user.creditCard}
             </li>
           </ul>
+          <LogoutButton />
         </div>
       )}
 
