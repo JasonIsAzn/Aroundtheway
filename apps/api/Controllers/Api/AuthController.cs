@@ -109,12 +109,12 @@ public class AuthController : Controller
 
         // Create claims
         var claims = new List<Claim>
-    {
-        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new(ClaimTypes.Name, user.Email),
-        new(ClaimTypes.Email, user.Email),
-        new("role", user.IsAdmin ? "admin" : "user")
-    };
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Email),
+            new(ClaimTypes.Email, user.Email),
+            new("role", user.IsAdmin ? "admin" : "user")
+        };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
