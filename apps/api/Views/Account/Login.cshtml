@@ -1,0 +1,24 @@
+@model Aroundtheway.Api.ViewModels.Account.LoginFormViewModel
+
+<h1>Login</h1>
+
+<form method="post" action="/api/auth/login">
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model?.Error))
+    {
+        <p>@Model.Error</p>
+    }
+
+    <button type="submit">Login</button>
+</form>

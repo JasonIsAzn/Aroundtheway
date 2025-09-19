@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Aroundtheway.Api.Data;
 using MySqlConnector;
+using Aroundtheway.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,10 @@ builder.Services.AddSession(options =>
     options.Cookie.Name = "Aroundtheway.Session";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
+builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
+
 
 var connectionString = builder.Configuration.GetConnectionString("defaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
@@ -36,7 +39,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapStaticAssets();
+app.UseStaticFiles();
 
 
 app.MapGet("/dbping", async () =>
@@ -51,8 +54,7 @@ app.MapGet("/dbping", async () =>
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 app.Run();
