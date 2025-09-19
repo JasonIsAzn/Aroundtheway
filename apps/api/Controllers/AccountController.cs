@@ -18,13 +18,6 @@ public class AccountController : Controller
         _passwords = passwords;
     }
 
-    [HttpGet("register")]
-    public IActionResult Register()
-    {
-        ViewData["Title"] = "Register";
-        return View(new RegisterFormViewModel());
-    }
-
     [HttpGet("login")]
     public IActionResult Login(string? error)
     {
