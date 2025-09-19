@@ -122,22 +122,30 @@ public class AuthController : Controller
     }
 
     [HttpGet("me")]
-    public IActionResult Me()
+    public async Task<IActionResult> Me()
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
         if (userId == null) return Unauthorized();
 
-        var user = _context.Users.Find(userId.Value);
-        if (user == null) return Unauthorized();
-
-        return Ok(new
+        try
         {
-            user.Id,
-            user.Email,
-            user.IsAdmin,
-            user.CreatedAt,
-            user.UpdatedAt
-        });
+            var user = await _context.Users.FindAsync(userId.Value);
+            if (user == null) return Unauthorized();
+
+            return Ok(new
+            {
+                user.Id,
+                user.Email,
+                user.IsAdmin,
+                user.CreatedAt,
+                user.UpdatedAt
+            });
+        }
+        catch (Exception ex)
+        {
+            // Optionally log the exception here
+            return StatusCode(500, new { message = "An error occurred while retrieving user information." });
+        }
     }
 
 
