@@ -16,11 +16,6 @@ export default function Home() {
           </Link>
         </li>
         <li>
-          <Link className="underline" href="/verify-email">
-            Email Verification
-          </Link>
-        </li>
-        <li>
           <Link className="underline" href="/server-playground">
             Server-side fetch playground
           </Link>
