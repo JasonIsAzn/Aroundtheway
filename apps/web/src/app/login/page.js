@@ -1,18 +1,22 @@
 "use client";
 
+import { login } from "@/lib/auth.client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 function Login() {
+  const router = useRouter();
+
   const [formState, setFormState] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateEmail = (email) => {
-    return email.trim() !== '' && email.includes('@') && email.includes('.');
+    return email.trim() !== "" && email.includes("@") && email.includes(".");
   };
 
   const handleChange = (event) => {
@@ -23,9 +27,9 @@ function Login() {
     });
 
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: undefined
+        [name]: undefined,
       }));
     }
   };
@@ -57,41 +61,24 @@ function Login() {
     }
 
     setIsSubmitting(true);
-
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formState.email,
-          password: formState.password
-        }),
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        alert('Login successful!');
-        // TODO: Store user session/token and redirect to dashboard
-        // localStorage.setItem('user', JSON.stringify(userData));
-        // window.location.href = '/dashboard';
-      } else {
-        const errorData = await response.json();
-        if (errorData.message?.includes('invalid credentials') || errorData.message?.includes('user not found')) {
-          setErrors({
-            email: 'Invalid email or password',
-            password: 'Invalid email or password'
-          });
-        } else if (errorData.message?.includes('email not found')) {
-          setErrors({ email: 'No account found with this email address' });
-        } else {
-          alert('Login failed. Please try again.');
-        }
-      }
+      const res = await login(formState);
+      console.log(res);
+      router.push("/");
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Login failed. Please check your connection and try again.');
+      console.log(error);
+      // setErr(error.message || "Login failed");
+      //   const errorData = await response.json();
+      //   if (errorData.message?.includes('invalid credentials') || errorData.message?.includes('user not found')) {
+      //     setErrors({
+      //       email: 'Invalid email or password',
+      //       password: 'Invalid email or password'
+      //     });
+      //   } else if (errorData.message?.includes('email not found')) {
+      //     setErrors({ email: 'No account found with this email address' });
+      //   } else {
+      //     alert('Login failed. Please try again.');
+      //   }
     } finally {
       setIsSubmitting(false);
     }
@@ -112,7 +99,10 @@ function Login() {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <input
@@ -132,7 +122,10 @@ function Login() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <input
@@ -152,20 +145,13 @@ function Login() {
             </div>
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
+              <div className="flex items-center"></div>
 
               <div className="text-sm">
-                <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                <a
+                  href="/forgot-password"
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
                   Forgot your password?
                 </a>
               </div>
@@ -177,14 +163,17 @@ function Login() {
                 disabled={isSubmitting}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Signing in...' : 'Sign in'}
+                {isSubmitting ? "Signing in..." : "Sign in"}
               </button>
             </div>
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Don&apos;t have an account?{' '}
-                <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                Don&apos;t have an account?{" "}
+                <a
+                  href="/register"
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
                   Sign up here
                 </a>
               </p>
