@@ -139,4 +139,22 @@ public class AuthController : Controller
             user.UpdatedAt
         });
     }
+
+
+    [HttpPost("logout")]
+    [Consumes("application/json")]
+    public IActionResult LogoutApi()
+    {
+        HttpContext.Session.Clear();
+
+        return Ok(new { message = "Logged out successfully" });
+    }
+
+    [HttpPost("logout")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public IActionResult LogoutWeb()
+    {
+        HttpContext.Session.Clear();
+        return RedirectToAction("Index", "Home");
+    }
 }
