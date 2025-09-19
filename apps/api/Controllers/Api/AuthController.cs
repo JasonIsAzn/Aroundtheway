@@ -66,7 +66,7 @@ public class AuthController : Controller
 
     [HttpPost("login")]
     [Consumes("application/json")]
-    public async Task<IActionResult> LoginApi([FromBody] LoginRequest dto)
+    public async Task<IActionResult> LoginApi(LoginRequest dto)
     {
         var email = (dto.Email ?? "").Trim().ToLowerInvariant();
         var password = (dto.Password ?? "").Trim();
