@@ -38,5 +38,11 @@ public class AccountController : Controller
         ViewData["Title"] = "Logout";
         return View();
     }
+
+    [HttpGet("access-denied")]
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
 }
 

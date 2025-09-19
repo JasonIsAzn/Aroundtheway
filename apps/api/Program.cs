@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Aroundtheway.Api.Data;
 using MySqlConnector;
 using Aroundtheway.Api.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,20 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(o =>
+    {
+        o.LoginPath = "/account/login";
+        o.AccessDeniedPath = "/account/access-denied";
+        o.Cookie.Name = "Aroundtheway.Auth";
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", p => p.RequireClaim("role", "admin"));
+});
+
 
 
 var connectionString = builder.Configuration.GetConnectionString("defaultConnection");
@@ -34,6 +49,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseSession();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
