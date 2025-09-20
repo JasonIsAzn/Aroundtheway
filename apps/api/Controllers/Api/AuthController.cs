@@ -128,7 +128,7 @@ public class AuthController : Controller
             .FirstOrDefaultAsync(u => u.Email == email);
 
         if (user == null) return null;
-        if (!_passwordService.Verify(password, user.PasswordHash)) return null;
+        if (!_passwordService.Verify(password, user.PasswordHash!)) return null;
 
         return user;
     }
@@ -156,6 +156,7 @@ public class AuthController : Controller
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             // Optionally log the exception here
             return StatusCode(500, new { message = "An error occurred while retrieving user information." });
         }
