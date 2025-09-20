@@ -25,6 +25,13 @@ export async function logout() {
     headers: { "Content-Type": "application/json" },
   });
 }
+export async function googleLogin(idToken) {
+  const res = await apiFetch("/api/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ IdToken: idToken }),
+  });
+  return res.json();
+}
 
 export async function getMe() {
   const res = await apiFetch("/api/auth/me", {
