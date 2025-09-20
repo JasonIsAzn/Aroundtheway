@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload Test - Aroundtheway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-3xl font-light uppercase tracking-widest text-center text-black mb-8">
+            Image Upload Test
+        </h1>
+
+        <!-- API Info -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <p class="text-blue-800 text-sm font-medium mb-2">API Endpoints Available:</p>
+            <ul class="text-blue-700 text-sm space-y-1">
+                <li>• Single Upload: POST /api/ProductImage/upload/{productId}</li>
+                <li>• Multiple Upload: POST /api/ProductImage/upload-multiple/{productId}</li>
+                <li>• Get Images: GET /api/ProductImage/{productId}/images</li>
+            </ul>
+        </div>
+
+        <!-- Single Image Upload -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+            <h3 class="text-xl font-medium uppercase tracking-wide text-black mb-6">Single Image Upload</h3>
+            <form id="singleUploadForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
+                        Product ID:
+                    </label>
+                    <input
+                        type="text"
+                        id="productId"
+                        value="test-product-001"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        required
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
+                        Select Image:
+                    </label>
+                    <input
+                        type="file"
+                        id="singleFile"
+                        accept="image/*"
+                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800"
+                        required
+                    >
+                    <div id="singleFileInfo" class="hidden mt-3 p-3 bg-gray-50 rounded-md text-sm text-gray-700"></div>
+                </div>
+                <button
+                    type="submit"
+                    id="singleUploadBtn"
+                    class="w-full py-3 px-6 bg-black text-white uppercase tracking-wider text-sm font-medium rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                >
+                    Upload Single Image
+                </button>
+            </form>
+            <div id="singleResult" class="mt-6"></div>
+        </div>
+
+        <!-- Multiple Images Upload -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+            <h3 class="text-xl font-medium uppercase tracking-wide text-black mb-6">Multiple Images Upload</h3>
+            <form id="multipleUploadForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
+                        Product ID:
+                    </label>
+                    <input
+                        type="text"
+                        id="productIdMultiple"
+                        value="test-product-002"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        required
+                    >
+                </div>
+                <div>
+                    <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
+                        Select Images (Max 10):
+                    </label>
+                    <input
+                        type="file"
+                        id="multipleFiles"
+                        accept="image/*"
+                        multiple
+                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800"
+                        required
+                    >
+                    <div id="multipleFileInfo" class="hidden mt-3 p-3 bg-gray-50 rounded-md text-sm text-gray-700"></div>
+                </div>
+                <button
+                    type="submit"
+                    id="multipleUploadBtn"
+                    class="w-full py-3 px-6 bg-black text-white uppercase tracking-wider text-sm font-medium rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                >
+                    Upload Multiple Images
+                </button>
+            </form>
+            <div id="multipleResult" class="mt-6"></div>
+        </div>
+    </div>
+
+    <script>
+        // File info display
+        document.getElementById('singleFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const info = document.getElementById('singleFileInfo');
+            if (file) {
+                info.innerHTML = `
+                    <strong>Selected:</strong> ${file.name}<br>
+                    <strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB<br>
+                    <strong>Type:</strong> ${file.type}
+                `;
+                info.classList.remove('hidden');
+            } else {
+                info.classList.add('hidden');
+            }
+        });
+
+        document.getElementById('multipleFiles').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const info = document.getElementById('multipleFileInfo');
+            if (files.length > 0) {
+                let fileList = '';
+                for (let i = 0; i < files.length; i++) {
+                    fileList += `${i + 1}. ${files[i].name} (${(files[i].size / 1024 / 1024).toFixed(2)} MB)<br>`;
+                }
+                info.innerHTML = `
+                    <strong>Selected ${files.length} file(s):</strong><br>
+                    ${fileList}
+                `;
+                info.classList.remove('hidden');
+            } else {
+                info.classList.add('hidden');
+            }
+        });
+
+        // Single upload form
+        document.getElementById('singleUploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('singleUploadBtn');
+            const result = document.getElementById('singleResult');
+            const productId = document.getElementById('productId').value;
+            const file = document.getElementById('singleFile').files[0];
+
+            if (!file) {
+                result.innerHTML = '<div class="bg-red-50 border border-red-200 rounded-md p-4 text-red-800">Please select a file</div>';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Uploading...';
+            result.innerHTML = '';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch(`/api/ProductImage/upload/${productId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="bg-green-50 border border-green-200 rounded-md p-4">
+                            <div class="text-green-800">
+                                <p class="font-medium text-sm uppercase tracking-wide">Upload Successful!</p>
+                                <p class="text-sm mt-2"><strong>File Name:</strong> ${data.fileName}</p>
+                                <p class="text-sm"><strong>Message:</strong> ${data.message}</p>
+
+                                <div class="mt-4 p-3 bg-gray-50 rounded-md">
+                                    <p class="text-xs font-medium uppercase tracking-wide mb-2">Image URL:</p>
+                                    <p class="text-xs font-mono text-gray-700 break-all">${data.imageUrl}</p>
+                                    <button
+                                        onclick="copyToClipboard('${data.imageUrl}')"
+                                        class="mt-2 px-3 py-1 bg-green-600 text-white text-xs uppercase tracking-wide rounded hover:bg-green-700"
+                                    >
+                                        Copy URL
+                                    </button>
+                                </div>
+
+                                <div class="mt-4 text-center">
+                                    <img src="${data.imageUrl}" alt="Uploaded image" class="max-w-full max-h-80 border border-gray-200 rounded-md">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-md p-4 text-red-800"><strong>Upload Failed:</strong> ${data.message}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-md p-4 text-red-800"><strong>Error:</strong> ${error.message}</div>`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Upload Single Image';
+            }
+        });
+
+        // Multiple upload form
+        document.getElementById('multipleUploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('multipleUploadBtn');
+            const result = document.getElementById('multipleResult');
+            const productId = document.getElementById('productIdMultiple').value;
+            const files = document.getElementById('multipleFiles').files;
+
+            if (files.length === 0) {
+                result.innerHTML = '<div class="bg-red-50 border border-red-200 rounded-md p-4 text-red-800">Please select at least one file</div>';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Uploading...';
+            result.innerHTML = '';
+
+            try {
+                const formData = new FormData();
+                for (let file of files) {
+                    formData.append('files', file);
+                }
+
+                const response = await fetch(`/api/ProductImage/upload-multiple/${productId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let imagesHtml = '';
+                    data.images.forEach(image => {
+                        imagesHtml += `
+                            <div class="mb-4 p-4 border border-gray-200 rounded-md">
+                                <p class="text-sm font-medium mb-2"><strong>File:</strong> ${image.fileName}</p>
+                                <div class="p-3 bg-gray-50 rounded-md mb-3">
+                                    <p class="text-xs font-mono text-gray-700 break-all">${image.imageUrl}</p>
+                                    <button
+                                        onclick="copyToClipboard('${image.imageUrl}')"
+                                        class="mt-2 px-3 py-1 bg-green-600 text-white text-xs uppercase tracking-wide rounded hover:bg-green-700"
+                                    >
+                                        Copy URL
+                                    </button>
+                                </div>
+                                <div class="text-center">
+                                    <img src="${image.imageUrl}" alt="Uploaded image" class="max-w-full max-h-48 border border-gray-200 rounded-md">
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    result.innerHTML = `
+                        <div class="bg-green-50 border border-green-200 rounded-md p-4">
+                            <div class="text-green-800">
+                                <p class="font-medium text-sm uppercase tracking-wide">Upload Successful!</p>
+                                <p class="text-sm mt-2"><strong>Count:</strong> ${data.count} images</p>
+                                <p class="text-sm"><strong>Message:</strong> ${data.message}</p>
+
+                                <div class="mt-4">
+                                    ${imagesHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-md p-4 text-red-800"><strong>Upload Failed:</strong> ${data.message}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="bg-red-50 border border-red-200 rounded-md p-4 text-red-800"><strong>Error:</strong> ${error.message}</div>`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Upload Multiple Images';
+            }
+        });
+
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('URL copied to clipboard!');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
