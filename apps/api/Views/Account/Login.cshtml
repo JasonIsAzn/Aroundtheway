@@ -22,3 +22,27 @@
 
     <button type="submit">Login</button>
 </form>
+
+<hr />
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<div id="g_id_onload" data-client_id="370878605755-ag67ab20l16ebblvkt5bbf65kcd5p40s.apps.googleusercontent.com"
+    data-callback="handleCredentialResponse" data-auto_prompt="false">
+</div>
+<div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"></div>
+
+<form id="googleForm" method="post" action="/api/auth/google-web" style="display:none">
+    <input type="hidden" id="googleIdToken" name="IdToken" />
+</form>
+
+<script>
+    function handleCredentialResponse(resp) {
+        if (!resp || !resp.credential) {
+            alert("Google login failed");
+            return;
+        }
+        document.getElementById("googleIdToken").value = resp.credential;
+        document.getElementById("googleForm").submit();
+    }
+</script>
