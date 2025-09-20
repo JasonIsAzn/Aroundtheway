@@ -31,6 +31,7 @@ public class AdminController : Controller
             {
                 Id = u.Id,
                 Email = u.Email,
+                GoogleSub = u.GoogleSub ?? "n/a",
                 CreatedAt = u.CreatedAt,
                 UpdatedAt = u.UpdatedAt,
                 IsAdmin = u.IsAdmin,
