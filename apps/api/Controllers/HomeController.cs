@@ -28,6 +28,19 @@ public class HomeController : Controller
         return View();
     }
 
+    public async Task<IActionResult> ImageUploadTest()
+    {
+        var userId = HttpContext.Session.GetInt32("SessionUserId");
+
+        if (userId != null)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
+            ViewBag.CurrentUser = user;
+        }
+        ViewData["Title"] = "Home Page";
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
