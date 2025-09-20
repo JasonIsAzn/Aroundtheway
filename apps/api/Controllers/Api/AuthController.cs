@@ -235,4 +235,82 @@ public class AuthController : Controller
 
         return Ok(new LoginResponse(user.Id, user.Email, user.IsAdmin));
     }
+
+    [HttpPost("google-web")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> GoogleLoginWeb([FromForm] GoogleLoginRequest dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.IdToken))
+            return View("../Account/Login", new LoginFormViewModel { Error = "Missing Google credential." });
+
+        var clientId = "370878605755-ag67ab20l16ebblvkt5bbf65kcd5p40s.apps.googleusercontent.com";
+
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(
+                dto.IdToken,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { clientId }
+                }
+            );
+        }
+        catch
+        {
+            return View("../Account/Login", new LoginFormViewModel { Error = "Invalid Google token." });
+        }
+
+        var email = (payload.Email ?? "").Trim().ToLowerInvariant();
+        var googleSub = payload.Subject;
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.GoogleSub == googleSub);
+
+        if (user == null && !string.IsNullOrEmpty(email))
+        {
+            var byEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (byEmail != null)
+            {
+                var subOwner = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.GoogleSub == googleSub);
+                if (subOwner != null && subOwner.Id != byEmail.Id)
+                {
+                    return View("../Account/Login", new LoginFormViewModel
+                    {
+                        Error = "This Google account is already linked to another user."
+                    });
+                }
+
+                if (string.IsNullOrEmpty(byEmail.GoogleSub))
+                {
+                    byEmail.GoogleSub = googleSub;
+                    byEmail.UpdatedAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                }
+
+                user = byEmail;
+            }
+        }
+
+        if (user == null)
+            return View("../Account/Login", new LoginFormViewModel { Error = "No account found for this Google user." });
+
+        if (!user.IsAdmin)
+            return View("../Account/Login", new LoginFormViewModel { Error = "You are not an admin." });
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Email),
+            new(ClaimTypes.Email, user.Email),
+            new("role", "admin")
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        var props = new AuthenticationProperties { IsPersistent = true, AllowRefresh = true };
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+        HttpContext.Session.SetInt32("SessionUserId", user.Id);
+
+        return RedirectToAction("Index", "Home");
+    }
 }
