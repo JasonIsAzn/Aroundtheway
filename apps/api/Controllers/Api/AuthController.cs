@@ -162,17 +162,18 @@ public class AuthController : Controller
 
     [HttpPost("logout")]
     [Consumes("application/json")]
-    public async Task<IActionResult> LogoutApi()
+    public IActionResult LogoutApi()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
         HttpContext.Session.Clear();
         return Ok(new { message = "Logged out successfully" });
     }
 
     [HttpPost("logout")]
     [Consumes("application/x-www-form-urlencoded")]
-    public IActionResult LogoutWeb()
+    public async Task<IActionResult> LogoutWeb()
     {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         HttpContext.Session.Clear();
         return RedirectToAction("Index", "Home");
     }
