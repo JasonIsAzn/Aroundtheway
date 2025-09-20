@@ -1,12 +1,15 @@
 "use client";
 
+import { register } from "@/lib/auth.client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 function RegistrationForm() {
+  const router = useRouter();
   const [formState, setFormState] = useState({
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
     /* TODO: Uncomment when backend is ready
     address: "",
     city: "",
@@ -32,15 +35,15 @@ function RegistrationForm() {
 
     // Clear errors when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: undefined
+        [name]: undefined,
       }));
     }
   };
 
   const validateEmail = (email) => {
-    return email.trim() !== '' && email.includes('@') && email.includes('.');
+    return email.trim() !== "" && email.includes("@") && email.includes(".");
   };
 
   const validatePassword = (password) => {
@@ -149,45 +152,13 @@ function RegistrationForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formState.email,
-          password: formState.password
-          /* TODO: Add when backend is ready
-          address: {
-            street: formState.address,
-            city: formState.city,
-            state: formState.state,
-            zipCode: formState.zipCode,
-            country: formState.country
-          },
-          creditCard: {
-            number: formState.creditCardNumber,
-            expiryDate: formState.expiryDate,
-            cvv: formState.cvv,
-            cardholderName: formState.cardholderName
-          }
-          */
-        }),
-      });
-
-      if (response.ok) {
-        alert('Registration successful!');
-      } else {
-        const errorData = await response.json();
-        if (errorData.message?.includes('email already exists')) {
-          setErrors({ email: 'This email is already registered' });
-        } else {
-          alert('Registration failed. Please try again.');
-        }
+      await register(formState);
+      router.push("/");
+    } catch (err) {
+      if (err.status === 409) {
+        console.log(err.message);
+        setErrors({ email: "Email already in use" });
       }
-    } catch (error) {
-      console.error('Registration error:', error);
-      alert('Registration failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -209,10 +180,15 @@ function RegistrationForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Account Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Account Information</h3>
+              <h3 className="text-lg font-medium text-gray-900">
+                Account Information
+              </h3>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Email address *
                 </label>
                 <input
@@ -230,7 +206,10 @@ function RegistrationForm() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Password *
                 </label>
                 <input
@@ -248,7 +227,10 @@ function RegistrationForm() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Confirm Password *
                 </label>
                 <input
@@ -261,7 +243,9 @@ function RegistrationForm() {
                   placeholder="Confirm your password"
                 />
                 {errors.confirmPassword && (
-                  <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.confirmPassword}
+                  </p>
                 )}
               </div>
             </div>
@@ -318,14 +302,17 @@ function RegistrationForm() {
                 disabled={isSubmitting}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                {isSubmitting ? "Creating Account..." : "Create Account"}
               </button>
             </div>
 
             <div className="text-center">
               <p className="text-sm text-gray-600">
-                Already have an account?{' '}
-                <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                Already have an account?{" "}
+                <a
+                  href="/login"
+                  className="font-medium text-blue-600 hover:text-blue-500"
+                >
                   Sign in here
                 </a>
               </p>

@@ -1,0 +1,48 @@
+@model Aroundtheway.Api.ViewModels.Account.LoginFormViewModel
+
+<h1>Login</h1>
+
+<form method="post" action="/api/auth/login">
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email"></span>
+    </div>
+
+    <div>
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" />
+        <span asp-validation-for="Password"></span>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model?.Error))
+    {
+        <p>@Model.Error</p>
+    }
+
+    <button type="submit">Login</button>
+</form>
+
+<hr />
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<div id="g_id_onload" data-client_id="370878605755-ag67ab20l16ebblvkt5bbf65kcd5p40s.apps.googleusercontent.com"
+    data-callback="handleCredentialResponse" data-auto_prompt="false">
+</div>
+<div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline"></div>
+
+<form id="googleForm" method="post" action="/api/auth/google-web" style="display:none">
+    <input type="hidden" id="googleIdToken" name="IdToken" />
+</form>
+
+<script>
+    function handleCredentialResponse(resp) {
+        if (!resp || !resp.credential) {
+            alert("Google login failed");
+            return;
+        }
+        document.getElementById("googleIdToken").value = resp.credential;
+        document.getElementById("googleForm").submit();
+    }
+</script>
