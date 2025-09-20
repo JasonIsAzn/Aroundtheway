@@ -7,6 +7,7 @@ Users
 {
     <p>@user.Id</p>
     <p>@user.Email</p>
+    <p>@(user.GoogleSub ?? "Not Google login")</p>
     <p>@user.CreatedAt</p>
     <p>@user.UpdatedAt</p>
     <p>@user.PasswordHash</p>

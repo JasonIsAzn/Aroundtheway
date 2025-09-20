@@ -7,6 +7,7 @@ public class UserViewModel
 {
     public int Id { get; set; }
     public string Email { get; set; } = string.Empty;
+    public string GoogleSub { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public bool IsAdmin { get; set; }

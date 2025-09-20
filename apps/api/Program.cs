@@ -24,6 +24,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         o.LoginPath = "/account/login";
         o.AccessDeniedPath = "/account/access-denied";
         o.Cookie.Name = "Aroundtheway.Auth";
+        o.Cookie.SameSite = SameSiteMode.Lax;
+        o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     });
 
 builder.Services.AddAuthorization(options =>
@@ -45,18 +47,18 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllers();
 
-app.UseStaticFiles();
 
 
 app.MapGet("/dbping", async () =>
