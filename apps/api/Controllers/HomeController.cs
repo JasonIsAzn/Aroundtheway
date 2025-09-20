@@ -16,7 +16,6 @@ public class HomeController : Controller
     }
 
     public async Task<IActionResult> Index()
-<<<<<<< HEAD
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
 
@@ -29,9 +28,7 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult ImageUploadTest()
-=======
->>>>>>> main
+    public async Task<IActionResult> ImageUploadTest()
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
 
