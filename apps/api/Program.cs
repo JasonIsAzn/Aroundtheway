@@ -62,6 +62,20 @@ builder.Services.AddScoped<IAmazonS3>(provider =>
     return new AmazonS3Client(accessKey, secretKey, awsConfig);
 });
 
+builder.Services.AddScoped<Supabase.Client>(provider =>
+{
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var url = configuration["Supabase:Url"];
+    var key = configuration["Supabase:Key"];
+
+    var options = new Supabase.SupabaseOptions
+    {
+        AutoConnectRealtime = false
+    };
+
+    return new Supabase.Client(url, key, options);
+});
+
 builder.Services.AddScoped<IImageStorageService, S3ImageStorageService>();
 
 var app = builder.Build();

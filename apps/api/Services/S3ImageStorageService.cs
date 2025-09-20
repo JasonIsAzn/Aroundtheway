@@ -103,8 +103,8 @@ public class S3ImageStorageService : IImageStorageService
     {
         try
         {
-            // For Supabase, construct the public URL directly
             var publicUrl = $"{_baseUrl}/storage/v1/object/public/{_bucketName}/{fileName}";
+            _logger.LogInformation("Generated public URL: {ImageUrl} for file: {FileName}", publicUrl, fileName);
             return publicUrl;
         }
         catch (Exception ex)
