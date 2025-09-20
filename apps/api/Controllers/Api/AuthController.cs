@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Google.Apis.Auth;
 
 namespace Aroundtheway.Api.Controllers.Api;
 
@@ -149,7 +150,8 @@ public class AuthController : Controller
                 user.Email,
                 user.IsAdmin,
                 user.CreatedAt,
-                user.UpdatedAt
+                user.UpdatedAt,
+                user.GoogleSub
             });
         }
         catch (Exception ex)
@@ -176,5 +178,60 @@ public class AuthController : Controller
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         HttpContext.Session.Clear();
         return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost("google")]
+    [Consumes("application/json")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.IdToken))
+            return BadRequest(new { message = "Missing id_token" });
+
+        var clientId = "370878605755-ag67ab20l16ebblvkt5bbf65kcd5p40s.apps.googleusercontent.com";
+
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(
+                dto.IdToken,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = [clientId]
+                }
+            );
+        }
+        catch (Exception)
+        {
+            return Unauthorized(new { message = "Invalid Google token" });
+        }
+
+        var email = (payload.Email ?? "").Trim().ToLowerInvariant();
+        var googleSub = payload.Subject;
+
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.GoogleSub == googleSub || u.Email == email);
+
+        if (user == null)
+        {
+            user = new User
+            {
+                Email = email,
+                GoogleSub = googleSub,
+                PasswordHash = null,
+            };
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+        else
+        {
+            user.GoogleSub ??= googleSub;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
+        HttpContext.Session.SetInt32("SessionUserId", user.Id);
+
+        return Ok(new LoginResponse(user.Id, user.Email, user.IsAdmin));
     }
 }
