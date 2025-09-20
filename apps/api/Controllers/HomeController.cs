@@ -16,6 +16,7 @@ public class HomeController : Controller
     }
 
     public async Task<IActionResult> Index()
+<<<<<<< HEAD
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
 
@@ -29,7 +30,17 @@ public class HomeController : Controller
     }
 
     public IActionResult ImageUploadTest()
+=======
+>>>>>>> main
     {
+        var userId = HttpContext.Session.GetInt32("SessionUserId");
+
+        if (userId != null)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
+            ViewBag.CurrentUser = user;
+        }
+        ViewData["Title"] = "Home Page";
         return View();
     }
 
