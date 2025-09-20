@@ -1,60 +1,90 @@
 "use client";
-import styles from './Header.module.css';
 import { useState } from 'react';
 
-function Header()
-{
+function Header() {
     const [logoSrc, setLogoSrc] = useState('/aroundthewayLogoA.png');
 
     return (
-        <div className={styles.container}>
+        <div className="bg-white sticky flex items-center h-16 px-6 border-b border-gray-200 relative z-[1000]">
+            <img
+                className="h-8 w-auto block object-contain"
+                src={logoSrc}
+                alt="Aroundtheway Logo"
+                onMouseEnter={() => setLogoSrc('/aroundthewayLogo.png')}
+                onMouseLeave={() => setLogoSrc('/aroundthewayLogoA.png')}
+            />
 
-        <img
-        className={styles.image}
-        src={logoSrc}
-        alt="Aroundtheway Logo"
-        onMouseEnter={() => setLogoSrc('/aroundthewayLogo.png')}
-        onMouseLeave={() => setLogoSrc('/aroundthewayLogoA.png')}
-        />    
-
-            <nav className={styles.navBarContainer}>
-                <ul className={styles.navBar}>
-                    <li className={styles.hasDropdown}>
-                        <a href="#">SHOP</a>
-                        <ul className={styles.dropdown} aria-label="Market submenu">
-                            <li><a href="/clothing">CLOTHING</a></li>
-                            <li><a href="#">ACCESSORIES</a></li>
+            <nav className="flex-1 ml-16 self-center">
+                <ul className="flex flex-row justify-start items-center gap-12 list-none m-0">
+                    <li className="relative group">
+                        <a
+                            href="#"
+                            className="text-black text-sm font-light hover:opacity-60 transition-opacity"
+                        >
+                            SHOP
+                        </a>
+                        <ul className="absolute top-full left-0 hidden group-hover:block bg-white border border-gray-100 py-2 min-w-32 shadow-sm">
+                            <li>
+                                <a
+                                    href="/clothing"
+                                    className="block px-4 py-2 text-sm text-black hover:bg-gray-50"
+                                >
+                                    CLOTHING
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="#"
+                                    className="block px-4 py-2 text-sm text-black hover:bg-gray-50"
+                                >
+                                    ACCESSORIES
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
-                    <li className={styles.hasDropdown}>
-                        <a href="#">COMMUNITY</a>
-                        <ul className={styles.dropdown} aria-label="Market submenu">
-                            <li><a href="#">EVENTS</a></li>
-                            <li><a href="#">BARBERSHOP</a></li>
-                        </ul>
+                    <li>
+                        <a
+                            href="#"
+                            className="text-black text-sm font-light hover:opacity-60 transition-opacity"
+                        >
+                            COMMUNITY
+                        </a>
                     </li>
-                    
-                    <li className={styles.hasDropdown}>
-                        <a href="#">CONTACT</a>
-                        <ul className={styles.dropdown} aria-label="Market submenu">
-                            <li><a href="#">INQUIRE</a></li>
 
-                        </ul>
-                    </li>    
-
+                    <li>
+                        <a
+                            href="#"
+                            className="text-black text-sm font-light hover:opacity-60 transition-opacity"
+                        >
+                            CONTACT
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
-            <section className={styles.navFooterContainer}>
-                <ul className={styles.navFooter}>
-                    <li><a href="#">ACCOUNT</a></li>
-                    <li><a href="#">BAG</a></li>
-                    {/* <a className={styles.numItemsInBag}><span>4</span></a> */}
+            <section>
+                <ul className="flex flex-row justify-end items-center gap-8 list-none m-0 p-0">
+                    <li>
+                        <a
+                            href="#"
+                            className="no-underline text-black tracking-tight text-xs"
+                        >
+                            ACCOUNT
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                            href="#"
+                            className="no-underline text-black tracking-tight text-xs"
+                        >
+                            BAG
+                        </a>
+                    </li>
                 </ul>
             </section>
-
         </div>
     );
 }
+
 export default Header;
