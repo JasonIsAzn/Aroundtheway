@@ -35,7 +35,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", p => p.RequireClaim("role", "admin"));
 });
 
-
+builder.Services.AddSingleton<Aroundtheway.Api.Services.StripeService>();
 
 var connectionString = builder.Configuration.GetConnectionString("defaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -87,7 +87,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 
 app.UseRouting();
