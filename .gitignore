@@ -19,11 +19,10 @@ Thumbs.db
 npm-debug.log*
 
 # Dependencies
-node_modules/# Ignore appsettings files with sensitive data
+node_modules/
+
+# Ignore appsettings files with sensitive data
 **/appsettings.json
 **/appsettings.Development.json
 **/.env
 **/.env.*
-
-**/appsettings.json
-**/appsettings.Development.json
