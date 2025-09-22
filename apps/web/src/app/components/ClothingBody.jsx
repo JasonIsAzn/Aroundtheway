@@ -1,11 +1,11 @@
 "use client";
-import { useState } from 'react';
+import { useState } from "react";
 
 function ProductCard({ front, back, description, price, productId = 1 }) {
   const [showBack, setShowBack] = useState(false);
 
   const handlePrev = () => setShowBack(false); // left arrow = front
-  const handleNext = () => setShowBack(true);  // right arrow = back
+  const handleNext = () => setShowBack(true); // right arrow = back
 
   const handleCardClick = () => {
     window.location.href = `/product/${productId}`;
@@ -33,7 +33,9 @@ function ProductCard({ front, back, description, price, productId = 1 }) {
         </button>
       </div>
       <div className="pt-3">
-        <p className="text-xs uppercase font-medium text-black">{description}</p>
+        <p className="text-xs uppercase font-medium text-black">
+          {description}
+        </p>
         <p className="text-xs text-black mt-1">{price}</p>
       </div>
     </section>
@@ -87,8 +89,6 @@ function ClothingBody() {
         description="CLASSIC GEAR TEE PIGMENT DYED"
         price="$45"
       />
-
-
     </div>
   );
 }

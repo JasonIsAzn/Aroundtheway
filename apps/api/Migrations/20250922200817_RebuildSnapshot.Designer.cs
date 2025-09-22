@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Aroundtheway.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250922144442_AddChatMessageModel")]
-    partial class AddChatMessageModel
+    [Migration("20250922200817_RebuildSnapshot")]
+    partial class RebuildSnapshot
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.17")
+                .HasAnnotation("ProductVersion", "8.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -59,6 +59,57 @@ namespace Aroundtheway.Api.Migrations
                     b.ToTable("ChatMessages");
                 });
 
+            modelBuilder.Entity("Aroundtheway.Api.Models.Post", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ImageUrls")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("NumOfLarge")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumOfMedium")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumOfSmall")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumOfXLarge")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Posts");
+                });
+
             modelBuilder.Entity("Aroundtheway.Api.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -82,11 +133,13 @@ namespace Aroundtheway.Api.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("GoogleSub")
+                        .HasColumnType("longtext");
+
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -109,6 +162,22 @@ namespace Aroundtheway.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Aroundtheway.Api.Models.Post", b =>
+                {
+                    b.HasOne("Aroundtheway.Api.Models.User", "User")
+                        .WithMany("Posts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Aroundtheway.Api.Models.User", b =>
+                {
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

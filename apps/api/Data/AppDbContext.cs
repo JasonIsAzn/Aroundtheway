@@ -9,6 +9,8 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
 
+    public DbSet<Post> Posts { get; set; } = null!;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
