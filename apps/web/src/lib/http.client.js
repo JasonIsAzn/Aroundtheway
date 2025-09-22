@@ -30,7 +30,11 @@ export async function apiFetch(url, options = {}) {
 
   if (!res.ok) {
     const message = await parseError(res);
-    throw new Error(message);
+    const error = new Error(message || `HTTP ${res.status}`);
+    error.status = res.status;
+    error.response = res;
+    throw error;
   }
+
   return res;
 }

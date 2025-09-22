@@ -24,6 +24,9 @@ export default async function Home() {
               <strong>Email:</strong> {user.email}
             </li>
             <li>
+              <strong>Google Id:</strong> {user.googleSub}
+            </li>
+            <li>
               <strong>CreatedAt:</strong> {user.createdAt}
             </li>
             <li>
