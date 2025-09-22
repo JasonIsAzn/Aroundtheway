@@ -152,10 +152,13 @@ function RegistrationForm() {
     setIsSubmitting(true);
 
     try {
-      await register({ email, password });
+      await register(formState);
       router.push("/");
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      if (err.status === 409) {
+        console.log(err.message);
+        setErrors({ email: "Email already in use" });
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -19,21 +19,23 @@ export async function login({ email, password }) {
 }
 
 export async function logout() {
-  const res = await fetch("/api/auth/logout", {
+  await apiFetch("/api/auth/logout", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
   });
-
-  if (!res.ok) {
-    throw new Error("Logout failed");
-  }
+}
+export async function googleLogin(idToken) {
+  const res = await apiFetch("/api/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ IdToken: idToken }),
+  });
+  return res.json();
 }
 
 export async function getMe() {
   const res = await apiFetch("/api/auth/me", {
     method: "GET",
-    credentials: "include",
   });
   return res.json();
 }

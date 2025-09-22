@@ -1,13 +1,69 @@
 @using Aroundtheway.Api.ViewModels.Users
 @model UsersViewModel
 
+<div class="min-h-screen bg-gray-100 p-6">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Users Directory</h1>
 
-Users
-@foreach (var user in Model.Users)
-{
-    <p>@user.Id</p>
-    <p>@user.Email</p>
-    <p>@user.CreatedAt</p>
-    <p>@user.UpdatedAt</p>
-    <p>@user.PasswordHash</p>
-}
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            @foreach (var user in Model.Users)
+            {
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">User #@user.Id</h3>
+                        @if (!string.IsNullOrEmpty(user.GoogleSub))
+                        {
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Google Account</span>
+                        }
+                        else
+                        {
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Local Account</span>
+                        }
+                    </div>
+
+                    <div class="space-y-2 text-sm">
+                        <div>
+                            <span class="font-medium text-gray-700">Email:</span>
+                            <span class="text-gray-900">@user.Email</span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(user.GoogleSub))
+                        {
+                            <div>
+                                <span class="font-medium text-gray-700">Google Sub:</span>
+                                <span class="text-gray-600 font-mono text-xs">@user.GoogleSub</span>
+                            </div>
+                        }
+
+                        <div>
+                            <span class="font-medium text-gray-700">Created:</span>
+                            <span class="text-gray-600">@user.CreatedAt.ToString("MMM d, yyyy")</span>
+                        </div>
+
+                        <div>
+                            <span class="font-medium text-gray-700">Last Updated:</span>
+                            <span class="text-gray-600">@user.UpdatedAt.ToString("MMM d, yyyy")</span>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(user.PasswordHash))
+                        {
+                            <div>
+                                <span class="font-medium text-gray-700">Auth Type:</span>
+                                <span class="text-gray-600">Password Protected</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!Model.Users.Any())
+        {
+            <div class="text-center py-12">
+                <div class="text-gray-400 text-6xl mb-4">👤</div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                <p class="text-gray-500">There are no users registered in the system yet.</p>
+            </div>
+        }
+    </div>
+</div>

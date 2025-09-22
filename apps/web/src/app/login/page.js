@@ -65,20 +65,13 @@ function Login() {
       const res = await login(formState);
       console.log(res);
       router.push("/");
-    } catch (error) {
-      console.log(error);
-      // setErr(error.message || "Login failed");
-      //   const errorData = await response.json();
-      //   if (errorData.message?.includes('invalid credentials') || errorData.message?.includes('user not found')) {
-      //     setErrors({
-      //       email: 'Invalid email or password',
-      //       password: 'Invalid email or password'
-      //     });
-      //   } else if (errorData.message?.includes('email not found')) {
-      //     setErrors({ email: 'No account found with this email address' });
-      //   } else {
-      //     alert('Login failed. Please try again.');
-      //   }
+    } catch (err) {
+      if (err.status === 401) {
+        setErrors({
+          email: "Invalid email or password",
+          password: "Invalid email or password",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
