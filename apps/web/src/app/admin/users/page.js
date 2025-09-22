@@ -39,13 +39,15 @@ export default function UserManagement() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="pb-5 border-b border-border">
-          <h3 className="text-2xl font-bold leading-6 text-foreground">User Management</h3>
-        </div>
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-muted-foreground">Loading users...</span>
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16 space-y-8">
+          <div className="pb-5 border-b border-gray-200">
+            <h3 className="text-2xl font-light tracking-wide uppercase text-gray-900">User Management</h3>
+          </div>
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+            <span className="ml-3 text-sm text-gray-600">Loading users...</span>
+          </div>
         </div>
       </div>
     );
@@ -53,16 +55,18 @@ export default function UserManagement() {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="pb-5 border-b border-border">
-          <h3 className="text-2xl font-bold leading-6 text-foreground">User Management</h3>
-        </div>
-        <div className="rounded-md bg-red-50 p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16 space-y-8">
+          <div className="pb-5 border-b border-gray-200">
+            <h3 className="text-2xl font-light tracking-wide uppercase text-gray-900">User Management</h3>
+          </div>
+          <div className="rounded-md bg-red-50 p-4">
+            <div className="flex">
+              <div className="ml-3">
+                <h3 className="text-sm font-light uppercase tracking-wide text-red-800">Error</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -102,18 +106,18 @@ export default function UserManagement() {
           </div>
         </div>
 
-        <div className="bg-background border border-border overflow-hidden shadow rounded-lg">
+        <div className="bg-white border border-gray-200 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6 text-gray-500"
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-muted-foreground truncate">Admins</dt>
-                  <dd className="text-2xl font-semibold text-foreground">
+                  <dt className="text-xs uppercase tracking-wide text-gray-500">Admins</dt>
+                  <dd className="text-2xl font-light text-gray-900"
                     {users.filter(user => user.isAdmin).length}
                   </dd>
                 </dl>
@@ -122,18 +126,18 @@ export default function UserManagement() {
           </div>
         </div>
 
-        <div className="bg-background border border-border overflow-hidden shadow rounded-lg">
+        <div className="bg-white border border-gray-200 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6 text-gray-500"
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-muted-foreground truncate">Google OAuth</dt>
-                  <dd className="text-2xl font-semibold text-foreground">
+                  <dt className="text-xs uppercase tracking-wide text-gray-500">Google OAuth</dt>
+                  <dd className="text-2xl font-light text-gray-900"
                     {users.filter(user => user.googleSub).length}
                   </dd>
                 </dl>

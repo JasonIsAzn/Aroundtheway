@@ -29,7 +29,7 @@ export default function DebugPage() {
     <div className="min-h-screen bg-white">
       <DynamicNav />
       
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
         <div className="space-y-8">
           {/* Header */}
           <div className="border-b border-gray-200 pb-5">
