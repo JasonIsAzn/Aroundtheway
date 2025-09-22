@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getMe } from '@/lib/auth.client';
+import { getMe, logout } from '@/lib/auth.client';
 
 export default function DynamicNav() {
   const [user, setUser] = useState(null);
@@ -41,7 +41,7 @@ export default function DynamicNav() {
             </div>
 
             {/* Navigation Links */}
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <div className="ml-6 flex space-x-8">
               {user ? (
                 <>
                   <Link
@@ -56,19 +56,12 @@ export default function DynamicNav() {
                   >
                     Debug Tools
                   </Link>
-                  <button
-                    onClick={async () => {
-                      try {
-                        await logout();
-                        window.location.href = '/login';
-                      } catch (error) {
-                        console.error('Logout failed:', error);
-                      }
-                    }}
-                    className="inline-flex items-center px-1 pt-1 text-sm font-light uppercase tracking-wide text-gray-500 hover:text-gray-700 cursor-pointer"
+                  <Link
+                    href="/logout"
+                    className="inline-flex items-center px-1 pt-1 text-sm font-light uppercase tracking-wide text-gray-500 hover:text-gray-700"
                   >
                     Logout
-                  </button>
+                  </Link>
                 </>
               ) : (
                 <Link
