@@ -1,0 +1,47 @@
+@using Aroundtheway.Api.ViewModels.Post
+@model IEnumerable<PostRowViewModel>
+
+@{
+    ViewData["Title"] = "All Posts";
+}
+
+<h2>All Posts</h2>
+
+<p>
+    <a href="/posts/new">Create New Post</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Product Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var post in Model)
+            {
+                <tr>
+                    <td>@post.Id</td>
+                    <td>@post.ProductName</td>
+                    <td>
+                        <a href="/posts/@post.Id/edit">Edit</a> |
+                        <form method="post" action="/posts/@post.Id/destroy" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" onclick="return confirm('Delete this post?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">No posts found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

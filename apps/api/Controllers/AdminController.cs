@@ -26,31 +26,6 @@ public class AdminController : Controller
         _context = context;
     }
 
-    //all post
-    [HttpGet("/all")]
-    public async Task<IActionResult> AllPosts()
-    {
-        var userId = HttpContext.Session.GetInt32(SessionUserId);
-        if (userId is not int uid)
-        {
-            return Unauthorized();
-        }
-
-        var vm = await _context
-            .Posts.AsNoTracking()
-            .Select(
-                (p) =>
-                    new PostRowViewModel
-                    {
-                        Id = p.Id,
-                        ProductName = p.ProductName,
-                    }
-            )
-            .ToListAsync();
-
-        return View(vm);
-    }
-
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {

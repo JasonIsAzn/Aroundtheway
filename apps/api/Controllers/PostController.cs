@@ -66,7 +66,7 @@ namespace Aroundtheway.Api.Controllers
             await _db.Posts.AddAsync(post);
             await _db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(PostDetails), new { id = post.Id });
+            return RedirectToAction(nameof(PostIndex));
         }
 
         // GET /posts/{id}
@@ -134,7 +134,7 @@ namespace Aroundtheway.Api.Controllers
             post.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(PostDetails), new { id });
+            return RedirectToAction(nameof(PostIndex));
         }
 
         // GET /posts/{id}/delete
@@ -171,12 +171,29 @@ namespace Aroundtheway.Api.Controllers
             return RedirectToAction(nameof(PostIndex));
         }
 
-        // optional: simple list page route (/posts)
+        //all post
         [HttpGet("")]
         public async Task<IActionResult> PostIndex()
         {
-            var posts = await _db.Posts.AsNoTracking().OrderByDescending(p => p.UpdatedAt).ToListAsync();
-            return View(posts);
+            var userId = HttpContext.Session.GetInt32(SessionUserIdKey);
+            if (userId is not int uid)
+            {
+                return Unauthorized();
+            }
+
+            var vm = await _db
+                .Posts.AsNoTracking()
+                .Select(
+                    (p) =>
+                        new PostRowViewModel
+                        {
+                            Id = p.Id,
+                            ProductName = p.ProductName,
+                        }
+                )
+                .ToListAsync();
+
+            return View(vm);
         }
     }
 }
