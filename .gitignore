@@ -25,3 +25,5 @@ node_modules/# Ignore appsettings files with sensitive data
 **/.env
 **/.env.*
 
+**/appsettings.json
+**/appsettings.Development.json
