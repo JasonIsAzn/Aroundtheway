@@ -3,6 +3,7 @@
 import { login } from "@/lib/auth.client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import DynamicNav from '@/components/DynamicNav';
 
 function Login() {
   const router = useRouter();
@@ -145,7 +146,7 @@ function Login() {
               <div className="text-sm">
                 <a
                   href="/forgot-password"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="text-xs uppercase tracking-wide text-black hover:text-gray-600"
                 >
                   Forgot your password?
                 </a>
@@ -167,7 +168,7 @@ function Login() {
                 Don&apos;t have an account?{" "}
                 <a
                   href="/register"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="text-xs uppercase tracking-wide text-black hover:text-gray-600"
                 >
                   Sign up here
                 </a>
@@ -177,6 +178,7 @@ function Login() {
         </div>
       </div>
     </main>
+    </div>
   );
 }
 
