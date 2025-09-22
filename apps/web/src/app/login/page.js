@@ -78,15 +78,17 @@ function Login() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Welcome back to Aroundtheway
-        </p>
-      </div>
+    <div className="min-h-screen bg-white">
+      <DynamicNav />
+      <main className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <h2 className="mt-6 text-center text-2xl font-light tracking-wide uppercase text-gray-900">
+            Sign in to your account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Welcome back to Aroundtheway
+          </p>
+        </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
@@ -94,7 +96,7 @@ function Login() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-light uppercase tracking-wide text-gray-900"
               >
                 Email address
               </label>
@@ -117,7 +119,7 @@ function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-light uppercase tracking-wide text-gray-900"
               >
                 Password
               </label>
@@ -154,7 +156,7 @@ function Login() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-light uppercase tracking-wide rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? "Signing in..." : "Sign in"}
               </button>
