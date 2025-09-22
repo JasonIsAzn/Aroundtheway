@@ -60,6 +60,15 @@ function Header() {
                             CONTACT
                         </a>
                     </li>
+
+                    <li>
+                        <a
+                            href="/chat"
+                            className="text-black text-sm font-light hover:opacity-60 transition-opacity"
+                        >
+                            CHAT
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
