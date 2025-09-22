@@ -2,12 +2,16 @@ using System.Security.Claims;
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.ViewModels.Users;
+using Aroundtheway.Api.ViewModels.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Aroundtheway.Api.Controllers;
+
+
 
 [Route("admin")]
 [Authorize(Policy = "AdminOnly")]
@@ -15,11 +19,37 @@ public class AdminController : Controller
 {
     private readonly AppDbContext _context;
 
+    public string SessionUserId { get; private set; }
+
     public AdminController(AppDbContext context)
     {
         _context = context;
     }
 
+    //all post
+    [HttpGet("/all")]
+    public async Task<IActionResult> AllPosts()
+    {
+        var userId = HttpContext.Session.GetInt32(SessionUserId);
+        if (userId is not int uid)
+        {
+            return Unauthorized();
+        }
+
+        var vm = await _context
+            .Posts.AsNoTracking()
+            .Select(
+                (p) =>
+                    new PostRowViewModel
+                    {
+                        Id = p.Id,
+                        ProductName = p.ProductName,
+                    }
+            )
+            .ToListAsync();
+
+        return View(vm);
+    }
 
     [HttpGet("")]
     public async Task<IActionResult> Index()
