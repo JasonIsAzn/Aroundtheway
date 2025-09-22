@@ -10,37 +10,13 @@ export default function UserManagement() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // TODO: Replace with actual API endpoint when backend is ready
-        // For now, using mock data
-        setTimeout(() => {
-          setUsers([
-            {
-              id: 1,
-              email: "admin@aroundtheway.com",
-              isAdmin: true,
-              createdAt: "2024-01-15T10:30:00Z",
-              address: "123 Admin St, Admin City",
-              googleSub: null
-            },
-            {
-              id: 2,
-              email: "john.doe@example.com",
-              isAdmin: false,
-              createdAt: "2024-02-20T14:22:00Z",
-              address: "456 User Ave, User Town",
-              googleSub: "google_123456789"
-            },
-            {
-              id: 3,
-              email: "jane.smith@example.com",
-              isAdmin: false,
-              createdAt: "2024-03-10T09:15:00Z",
-              address: "789 Customer Blvd, Customer City",
-              googleSub: null
-            }
-          ]);
-          setLoading(false);
-        }, 1000);
+        const response = await fetch('/api/admin/users');
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        const data = await response.json();
+        setUsers(data);
+        setLoading(false);
       } catch (err) {
         console.error('Failed to fetch users:', err);
         setError('Failed to load users');
@@ -96,22 +72,23 @@ export default function UserManagement() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="pb-5 border-b border-border">
-        <h3 className="text-2xl font-bold leading-6 text-foreground">User Management</h3>
-        <p className="mt-2 max-w-4xl text-sm text-muted-foreground">
-          Manage user accounts and permissions
-        </p>
-      </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        {/* Page header */}
+        <div className="pb-5 border-b border-gray-200">
+          <h3 className="text-2xl font-light tracking-wide uppercase">User Management</h3>
+          <p className="mt-2 text-sm text-gray-600">
+            Manage user accounts and permissions
+          </p>
+        </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="bg-background border border-border overflow-hidden shadow rounded-lg">
+        <div className="bg-white border border-gray-200 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
@@ -227,13 +204,61 @@ export default function UserManagement() {
       <div className="flex justify-end space-x-3">
         <button
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-border shadow-sm text-sm font-medium rounded-md text-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          onClick={async () => {
+            try {
+              const response = await fetch('/api/admin/users/export', {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+              if (!response.ok) throw new Error('Failed to export users');
+              const blob = await response.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'users-export.csv';
+              document.body.appendChild(a);
+              a.click();
+              window.URL.revokeObjectURL(url);
+            } catch (err) {
+              console.error('Failed to export users:', err);
+              setError('Failed to export users');
+            }
+          }}
+className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm uppercase tracking-wider font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
         >
           Export Users
         </button>
         <button
           type="button"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          onClick={async () => {
+            const email = prompt('Enter user email:');
+            const password = prompt('Enter user password:');
+            if (!email || !password) return;
+            
+            try {
+              const response = await fetch('/api/admin/users', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+              });
+              
+              if (!response.ok) throw new Error('Failed to create user');
+              
+              // Refresh user list
+              const updatedResponse = await fetch('/api/admin/users');
+              if (!updatedResponse.ok) throw new Error('Failed to fetch users');
+              const updatedData = await updatedResponse.json();
+              setUsers(updatedData);
+            } catch (err) {
+              console.error('Failed to create user:', err);
+              setError('Failed to create user');
+            }
+          }}
+className="inline-flex items-center px-4 py-2 border border-transparent text-sm uppercase tracking-wider font-medium rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors"
         >
           Add User
         </button>
