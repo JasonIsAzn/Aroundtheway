@@ -2,12 +2,16 @@ using System.Security.Claims;
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.ViewModels.Users;
+using Aroundtheway.Api.ViewModels.Post;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace Aroundtheway.Api.Controllers;
+
+
 
 [Route("admin")]
 [Authorize(Policy = "AdminOnly")]
@@ -15,11 +19,12 @@ public class AdminController : Controller
 {
     private readonly AppDbContext _context;
 
+    public string SessionUserId { get; private set; }
+
     public AdminController(AppDbContext context)
     {
         _context = context;
     }
-
 
     [HttpGet("")]
     public async Task<IActionResult> Index()

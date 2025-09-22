@@ -1,7 +1,8 @@
-using Aroundtheway.Api.Data;
-using Aroundtheway.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using Aroundtheway.Api.Data;
 using MySqlConnector;
+using Aroundtheway.Api.Services;
+using OpenAI.Chat;
 using Amazon.S3;
 using Amazon;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -19,6 +20,14 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
+
+// Configure OpenAI ChatClient
+var openAIApiKey = builder.Configuration["OpenAI:ApiKey"] ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+if (string.IsNullOrEmpty(openAIApiKey))
+{
+    throw new InvalidOperationException("OpenAI API key is not configured. Set OPENAI_API_KEY environment variable or add OpenAI:ApiKey to appsettings.json");
+}
+builder.Services.AddSingleton(new ChatClient("gpt-4", openAIApiKey));
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>

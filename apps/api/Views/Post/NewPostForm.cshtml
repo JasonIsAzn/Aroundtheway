@@ -1,0 +1,62 @@
+@using Aroundtheway.Api.ViewModels.Post
+@model PostFormViewModel
+
+@{
+    ViewData["Title"] = "Add a post";
+}
+
+<h1 class="display-4">Add Post</h1>
+
+<div class="card shadow">
+    <form asp-action="CreatePost" asp-controller="Post" method="post">
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="ProductName" class="form-label">Product Name*:</label>
+                <input asp-for="ProductName" class="form-control" />
+                <span asp-validation-for="ProductName" class="form-text text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Color" class="form-label">Color*:</label>
+                <input asp-for="Color" class="form-control" />
+                <span asp-validation-for="Color" class="form-text text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Price" class="form-label">Price*:</label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="form-text text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NumOfSmall" class="form-label">Number of Small Inventory:</label>
+                <input asp-for="NumOfSmall" class="form-control" />
+                <span asp-validation-for="NumOfSmall" class="form-text text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NumOfMedium" class="form-label">Number of Medium Inventory:</label>
+                <input asp-for="NumOfMedium" class="form-control" />
+                <span asp-validation-for="NumOfMedium" class="form-text text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NumOfLarge" class="form-label">Number of Large Inventory:</label>
+                <input asp-for="NumOfLarge" class="form-control" />
+                <span asp-validation-for="NumOfLarge" class="form-text text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NumOfXLarge" class="form-label">Number of X-Large Inventory:</label>
+                <input asp-for="NumOfXLarge" class="form-control" />
+                <span asp-validation-for="NumOfXLarge" class="form-text text-danger"></span>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Add Post</button>
+            </div>
+        </div>
+    </form>
+</div>
