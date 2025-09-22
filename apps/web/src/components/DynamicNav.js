@@ -35,7 +35,7 @@ export default function DynamicNav() {
           <div className="flex">
             {/* Logo/Brand */}
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="text-xl font-bold text-gray-900">
+              <Link href="/" className="text-xl font-light tracking-wide uppercase text-gray-900">
                 Aroundtheway
               </Link>
             </div>
@@ -46,13 +46,13 @@ export default function DynamicNav() {
                 <>
                   <Link
                     href="/admin"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    className="inline-flex items-center px-1 pt-1 text-sm font-light uppercase tracking-wide text-gray-500 hover:text-gray-700"
                   >
                     Admin Index
                   </Link>
                   <Link
                     href="/admin/debug"
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    className="inline-flex items-center px-1 pt-1 text-sm font-light uppercase tracking-wide text-gray-500 hover:text-gray-700"
                   >
                     Debug Tools
                   </Link>
@@ -65,7 +65,7 @@ export default function DynamicNav() {
                         console.error('Logout failed:', error);
                       }
                     }}
-                    className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    className="inline-flex items-center px-1 pt-1 text-sm font-light uppercase tracking-wide text-gray-500 hover:text-gray-700 cursor-pointer"
                   >
                     Logout
                   </button>
@@ -73,7 +73,7 @@ export default function DynamicNav() {
               ) : (
                 <Link
                   href="/login"
-                  className="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  className="inline-flex items-center px-1 pt-1 text-sm font-light uppercase tracking-wide text-gray-500 hover:text-gray-700"
                 >
                   Login
                 </Link>

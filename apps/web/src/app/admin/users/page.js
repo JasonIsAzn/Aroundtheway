@@ -84,7 +84,7 @@ export default function UserManagement() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="bg-white border border-gray-200 overflow-hidden shadow rounded-lg">
+        <div className="bg-white border border-gray-200 overflow-hidden rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -144,10 +144,10 @@ export default function UserManagement() {
       </div>
 
       {/* Users table */}
-      <div className="bg-background border border-border shadow overflow-hidden sm:rounded-md">
+      <div className="bg-white border border-gray-200 shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-foreground">Users</h3>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          <h3 className="text-lg tracking-wide uppercase font-light text-gray-900">Users</h3>
+          <p className="mt-1 max-w-2xl text-sm text-gray-600">
             A list of all users including their email, role, and registration date.
           </p>
         </div>
@@ -158,15 +158,15 @@ export default function UserManagement() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                        <span className="text-sm font-medium text-foreground">
+                      <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <span className="text-sm font-medium text-gray-900">
                           {user.email.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     </div>
                     <div className="ml-4">
                       <div className="flex items-center">
-                        <p className="text-sm font-medium text-foreground">{user.email}</p>
+                        <p className="text-sm font-medium text-gray-900">{user.email}</p>
                         {user.isAdmin && (
                           <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                             Admin
@@ -178,7 +178,7 @@ export default function UserManagement() {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center text-sm text-muted-foreground">
+                      <div className="flex items-center text-sm text-gray-600">
                         <svg className="flex-shrink-0 mr-1.5 h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -187,7 +187,7 @@ export default function UserManagement() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center text-sm text-muted-foreground">
+                    <div className="flex items-center text-sm text-gray-600">
                     <svg className="flex-shrink-0 mr-1.5 h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3a4 4 0 118 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
