@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.ViewModels.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Aroundtheway.Api.Controllers;
 
 [Route("user")]
+[Authorize(Policy = "AdminOnly")]
 public class UserController : Controller
 {
     private readonly AppDbContext _context;
