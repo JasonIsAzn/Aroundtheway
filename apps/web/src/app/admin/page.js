@@ -72,7 +72,7 @@ export default function AdminIndex() {
     <div className="min-h-screen bg-white">
       <DynamicNav />
       
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
         <div className="space-y-8">
           {/* Header */}
           <div className="border-b border-gray-200 pb-5">
@@ -97,8 +97,8 @@ export default function AdminIndex() {
                     {tool.icon}
                   </div>
                   <div>
-                    <h2 className="text-xl font-light uppercase tracking-wide text-gray-900">{tool.name}</h2>
-                    <p className="mt-1 text-sm text-gray-500">{tool.description}</p>
+                    <h2 className="text-xs uppercase tracking-wide text-black">{tool.name}</h2>
+                    <p className="mt-1 text-xs text-black">{tool.description}</p>
                   </div>
                 </div>
               </Link>

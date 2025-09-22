@@ -73,7 +73,7 @@ export default function UserManagement() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16 space-y-8">
         {/* Page header */}
         <div className="pb-5 border-b border-gray-200">
           <h3 className="text-2xl font-light tracking-wide uppercase">User Management</h3>
@@ -94,8 +94,8 @@ export default function UserManagement() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-muted-foreground truncate">Total Users</dt>
-                  <dd className="text-2xl font-semibold text-foreground">{users.length}</dd>
+                  <dt className="text-xs uppercase tracking-wide text-gray-500">Total Users</dt>
+                  <dd className="text-2xl font-light text-gray-900">{users.length}</dd>
                 </dl>
               </div>
             </div>
@@ -156,24 +156,24 @@ export default function UserManagement() {
             <li key={user.id}>
               <div className="px-4 py-4 sm:px-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
-                        <span className="text-sm font-medium text-gray-900">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-gray-50 flex items-center justify-center">
+                <span className="text-xs uppercase tracking-wide text-gray-900">
                           {user.email.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     </div>
                     <div className="ml-4">
                       <div className="flex items-center">
-                        <p className="text-sm font-medium text-gray-900">{user.email}</p>
+                        <p className="text-xs uppercase tracking-wide text-black">{user.email}</p>
                         {user.isAdmin && (
-                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs uppercase tracking-wide bg-black text-white">
                             Admin
                           </span>
                         )}
                         {user.googleSub && (
-                          <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs uppercase tracking-wide bg-gray-900 text-white">
                             Google
                           </span>
                         )}
