@@ -54,7 +54,7 @@ export default function DebugPage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-light uppercase tracking-wide text-gray-900">User Index</h2>
+                  <h2 className="text-xs uppercase tracking-wide text-black">
                   <p className="mt-1 text-sm text-gray-500">View and manage user accounts</p>
                 </div>
               </div>
@@ -71,8 +71,8 @@ export default function DebugPage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-light uppercase tracking-wide text-gray-900">Image Upload Test</h2>
-                  <p className="mt-1 text-sm text-gray-500">Test image upload functionality</p>
+                  <h2 className="text-xs uppercase tracking-wide text-black">Image Upload Test</h2>
+                  <p className="mt-1 text-xs text-black">
                 </div>
               </div>
             </Link>
@@ -85,7 +85,7 @@ export default function DebugPage() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="text-xl font-light uppercase tracking-wide text-gray-900">Database Status</h2>
+                  <h2 className="text-xs uppercase tracking-wide text-black">Database Status</h2>
                   <div className="mt-1">
                     {loading ? (
                       <p className="text-sm text-gray-500">Checking status...</p>
