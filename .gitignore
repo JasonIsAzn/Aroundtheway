@@ -20,3 +20,7 @@ npm-debug.log*
 
 # Dependencies
 node_modules/
+
+# Application settings
+apps/api/appsettings.json
+apps/api/appsettings.Development.json
