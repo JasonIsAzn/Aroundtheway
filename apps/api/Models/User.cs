@@ -13,4 +13,6 @@ public class User
     public bool IsAdmin { get; set; } = false;
     public string Address { get; set; } = string.Empty; // TODO Improve typing
     public string CreditCard { get; set; } = string.Empty; // TODO encrypt this
+
+    public List<Post> Posts { get; set; } = [];
 }
