@@ -1,84 +1,93 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getMe, updateMyAddress } from "@/lib/users.client"; // adjust path
 
-function UserProfile() {
+export default function UserProfile() {
+  const [email, setEmail] = useState("");
+  const [googleSub, setGoogleSub] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
+  const [updatedAt, setUpdatedAt] = useState("");
   const [formState, setFormState] = useState({
-    email: "",
     address: "",
     city: "",
     state: "",
     zipCode: "",
     country: "",
   });
-
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const validateEmail = (email) => {
-    return email.trim() !== "" && email.includes("@") && email.includes(".");
-  };
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const data = await getMe();
+        setEmail(data.email || "");
+        setGoogleSub(data.googleSub || "");
+        setCreatedAt(data.createdAt || "");
+        setUpdatedAt(data.updatedAt || "");
+        setFormState({
+          address: data.address?.address || "",
+          city: data.address?.city || "",
+          state: data.address?.state || "",
+          zipCode: data.address?.zipCode || "",
+          country: data.address?.country || "",
+        });
+      } catch (e) {
+        console.error("Failed to load profile", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadProfile();
+  }, []);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormState((prev) => {
-      return { ...prev, [name]: value };
-    });
-
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: undefined,
-      }));
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
   const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-
-    if (!formState.email) {
-      newErrors.email = "Email is required";
-      isValid = false;
-    } else if (!validateEmail(formState.email)) {
-      newErrors.email = "Please enter a valid email address";
-      isValid = false;
+    let ok = true;
+    const next = {};
+    if (formState.zipCode && formState.zipCode.length > 20) {
+      next.zipCode = "ZIP/Postal code looks too long";
+      ok = false;
     }
-
-    setErrors(newErrors);
-    return isValid;
+    if (formState.state && formState.state.length > 100) {
+      next.state = "State/Province looks too long";
+      ok = false;
+    }
+    if (formState.country && formState.country.length > 100) {
+      next.country = "Country looks too long";
+      ok = false;
+    }
+    setErrors(next);
+    return ok;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
-
     try {
-      // const response = await fetch("/api/user/profile", {
-      //   method: "PUT",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      // });
+      const payload = {
+        address: formState.address || null,
+        city: formState.city || null,
+        state: formState.state || null,
+        zipCode: formState.zipCode || null,
+        country: formState.country || null,
+      };
 
-      if (response.ok) {
-        alert("Profile updated successfully!");
-      } else {
-        const errorData = await response.json();
-        if (errorData.message?.includes("email already exists")) {
-          setErrors({ email: "This email address is already in use" });
-        } else {
-          alert("Profile update failed. Please try again.");
-        }
-      }
-    } catch (error) {
-      console.error("Profile update error:", error);
+      await updateMyAddress(payload);
+      const me = await getMe();
+      if (me?.updatedAt) setUpdatedAt(me.updatedAt);
+      alert("Address updated successfully!");
+    } catch (e) {
+      console.error("Profile update error:", e);
       alert(
         "Profile update failed. Please check your connection and try again."
       );
@@ -86,6 +95,14 @@ function UserProfile() {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-500">Loading profile…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -95,47 +112,44 @@ function UserProfile() {
             <h1 className="text-2xl font-bold text-gray-900">
               Profile Settings
             </h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Update your account information and preferences
-            </p>
+            <p className="mt-1 text-sm text-gray-600">Update your address</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="px-6 py-6 space-y-6">
+          <div className="px-6 pt-6 space-y-4">
+            {/* Email display */}
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                Personal Information
-              </h2>
-
-              <div className="mt-4">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email Address *
-                </label>
-                <div className="mt-1 relative">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formState.email}
-                    onChange={handleChange}
-                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="Enter your email address"
-                  />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span className="text-xs text-gray-500">
-                      Email verification status would go here
-                    </span>
-                  </div>
-                </div>
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
+              <label className="block text-sm font-medium text-gray-700">
+                Email (read-only)
+              </label>
+              <div className="mt-1 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-700 text-sm">
+                {email || "—"}
               </div>
             </div>
 
+            {/* Optional metadata for your prototype */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="block text-gray-500">Google Sub</span>
+                <span className="block text-gray-900 break-all">
+                  {googleSub || "—"}
+                </span>
+              </div>
+              <div>
+                <span className="block text-gray-500">Created At</span>
+                <span className="block text-gray-900">
+                  {createdAt ? new Date(createdAt).toLocaleString() : "—"}
+                </span>
+              </div>
+              <div>
+                <span className="block text-gray-500">Last Updated</span>
+                <span className="block text-gray-900">
+                  {updatedAt ? new Date(updatedAt).toLocaleString() : "—"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-6">
             <div>
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 Address Information
@@ -155,9 +169,14 @@ function UserProfile() {
                     type="text"
                     value={formState.address}
                     onChange={handleChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter your street address"
                   />
+                  {errors.address && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.address}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -174,9 +193,12 @@ function UserProfile() {
                       type="text"
                       value={formState.city}
                       onChange={handleChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
                       placeholder="City"
                     />
+                    {errors.city && (
+                      <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+                    )}
                   </div>
 
                   <div>
@@ -192,9 +214,14 @@ function UserProfile() {
                       type="text"
                       value={formState.state}
                       onChange={handleChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
                       placeholder="State"
                     />
+                    {errors.state && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.state}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -210,9 +237,14 @@ function UserProfile() {
                       type="text"
                       value={formState.zipCode}
                       onChange={handleChange}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
                       placeholder="ZIP Code"
                     />
+                    {errors.zipCode && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.zipCode}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -229,9 +261,14 @@ function UserProfile() {
                     type="text"
                     value={formState.country}
                     onChange={handleChange}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
                     placeholder="Enter your country"
                   />
+                  {errors.country && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.country}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -239,17 +276,9 @@ function UserProfile() {
             <div className="pt-4 border-t border-gray-200">
               <div className="flex justify-between">
                 <button
-                  type="button"
-                  onClick={() => window.history.back()}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Cancel
-                </button>
-
-                <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
                 >
                   {isSubmitting ? "Updating..." : "Update Profile"}
                 </button>
@@ -261,5 +290,3 @@ function UserProfile() {
     </main>
   );
 }
-
-export default UserProfile;
