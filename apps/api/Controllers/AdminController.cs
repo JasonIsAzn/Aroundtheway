@@ -29,23 +29,23 @@ public class AdminController : Controller
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpGet("users")]
+    public async Task<IActionResult> Users()
+    {
         var users = await _context.Users
             .AsNoTracking()
             .OrderBy(u => u.Id)
-            .Select(u => new UserViewModel
-            {
-                Id = u.Id,
-                Email = u.Email,
-                GoogleSub = u.GoogleSub ?? "n/a",
-                CreatedAt = u.CreatedAt,
-                UpdatedAt = u.UpdatedAt,
-                IsAdmin = u.IsAdmin,
-                Address = u.Address,
-                CreditCard = u.CreditCard
-            })
             .ToListAsync();
 
-        return View(users);
+        var vm = new Aroundtheway.Api.ViewModels.Admin.UsersViewModel
+        {
+            Users = users
+        };
+
+        return View(vm);
     }
 
     [HttpPost("promote/{id}")]
