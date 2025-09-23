@@ -25,8 +25,6 @@ public class PostFormViewModel
     [Required(ErrorMessage = "Post amount of x-large inventory is required.")]
     public string NumOfXLarge { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Post image(s) is required")]
-    public List<string> ImageUrls { get; set; } = new();
-
-
+    public List<string>? ImageUrls { get; set; }
+    public IFormFile[]? Images { get; set; }
 }

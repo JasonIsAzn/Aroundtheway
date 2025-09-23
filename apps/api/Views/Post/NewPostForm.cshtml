@@ -8,7 +8,8 @@
 <h1 class="display-4">Add Post</h1>
 
 <div class="card shadow">
-    <form asp-action="CreatePost" asp-controller="Post" method="post">
+    <form asp-action="CreatePost" asp-controller="Post" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
         <div class="card-body">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -54,9 +55,38 @@
                 <span asp-validation-for="NumOfXLarge" class="form-text text-danger"></span>
             </div>
 
+            <!-- Images -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6 mb-4">
+                <h3 class="text-xl font-medium uppercase tracking-wide text-black mb-3">Images (up to 10)</h3>
+
+                <input type="file" id="multipleFiles" name="Images" accept="image/*" multiple
+                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800" />
+
+                <div id="multipleFileInfo" class="hidden mt-3 p-3 bg-gray-50 rounded-md text-sm text-gray-700"></div>
+                <span asp-validation-for="Images" class="form-text text-danger"></span>
+            </div>
+
             <div class="text-end">
                 <button type="submit" class="btn btn-primary">Add Post</button>
             </div>
         </div>
     </form>
 </div>
+
+<script>
+    // Preview only (no separate upload)
+    const filesInput = document.getElementById('multipleFiles');
+    const infoBox = document.getElementById('multipleFileInfo');
+
+    filesInput.addEventListener('change', function (e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) { infoBox.classList.add('hidden'); infoBox.innerHTML = ''; return; }
+
+        if (files.length > 10) alert('Please select no more than 10 images.');
+        const totalMB = files.reduce((s, f) => s + f.size / 1024 / 1024, 0);
+        const list = files.map((f, i) => `${i + 1}. ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`).join('<br>');
+
+        infoBox.innerHTML = `<strong>Selected ${files.length} file(s), total ${totalMB.toFixed(2)} MB:</strong><br>${list}`;
+        infoBox.classList.remove('hidden');
+    });
+</script>
