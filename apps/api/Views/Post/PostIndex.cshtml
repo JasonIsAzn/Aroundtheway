@@ -5,33 +5,59 @@
     ViewData["Title"] = "All Posts";
 }
 
-<h2>All Posts</h2>
+<h2 class="text-2xl font-semibold mb-4">All Posts</h2>
 
-<p>
-    <a href="/posts/new">Create New Post</a>
+<p class="mb-4">
+    <a href="/posts/new" class="text-blue-600 hover:underline">Create New Post</a>
 </p>
 
-<table class="table">
-    <thead>
+<table class="min-w-full border border-gray-200 divide-y divide-gray-200">
+    <thead class="bg-gray-50">
         <tr>
-            <th>Id</th>
-            <th>Product Name</th>
-            <th>Actions</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Image</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Id</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Product Name</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-600">Actions</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="divide-y divide-gray-100">
         @if (Model != null && Model.Any())
         {
             foreach (var post in Model)
             {
-                <tr>
-                    <td>@post.Id</td>
-                    <td>@post.ProductName</td>
-                    <td>
-                        <a href="/posts/@post.Id/edit">Edit</a> |
-                        <form method="post" action="/posts/@post.Id/destroy" style="display:inline;">
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2">
+                        @if (!string.IsNullOrWhiteSpace(post.FirstImageUrl))
+                        {
+                            <div class="relative w-18 h-18 rounded-md overflow-hidden bg-gray-100">
+                                <img src="@post.FirstImageUrl" alt="Thumbnail for @post.ProductName" loading="lazy" decoding="async"
+                                    class="w-full h-full object-cover" />
+                                @if (post.ImageCount > 1)
+                                {
+                                    <span class="absolute right-1 bottom-1 text-xs px-2 py-0.5 bg-black/70 text-white rounded-full">
+                                        +@(post.ImageCount - 1)
+                                    </span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="w-18 h-18 flex items-center justify-center rounded-md bg-gray-200 text-gray-500 text-xs">
+                                No image
+                            </div>
+                        }
+                    </td>
+                    <td class="px-4 py-2 text-sm text-gray-800">@post.Id</td>
+                    <td class="px-4 py-2 text-sm text-gray-800">@post.ProductName</td>
+                    <td class="px-4 py-2 text-sm text-gray-600">
+                        <a href="/posts/@post.Id/edit" class="text-blue-600 hover:underline">Edit</a>
+                        <span class="mx-1">|</span>
+                        <form method="post" action="/posts/@post.Id/destroy" class="inline">
                             @Html.AntiForgeryToken()
-                            <button type="submit" onclick="return confirm('Delete this post?');">Delete</button>
+                            <button type="submit" onclick="return confirm('Delete this post?');"
+                                class="text-red-600 hover:underline">
+                                Delete
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -40,7 +66,7 @@
         else
         {
             <tr>
-                <td colspan="3">No posts found.</td>
+                <td colspan="4" class="px-4 py-4 text-center text-gray-500">No posts found.</td>
             </tr>
         }
     </tbody>

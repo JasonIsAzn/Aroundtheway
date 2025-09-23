@@ -265,27 +265,31 @@ namespace Aroundtheway.Api.Controllers
             return RedirectToAction(nameof(PostIndex));
         }
 
-        //all post
+        // GET /posts
         [HttpGet("")]
         public async Task<IActionResult> PostIndex()
         {
             var userId = HttpContext.Session.GetInt32(SessionUserIdKey);
-            if (userId is not int uid)
-            {
-                return Unauthorized();
-            }
+            if (userId is not int) return Unauthorized();
 
-            var vm = await _db
-                .Posts.AsNoTracking()
-                .Select(
-                    (p) =>
-                        new PostRowViewModel
-                        {
-                            Id = p.Id,
-                            ProductName = p.ProductName,
-                        }
-                )
+            var raw = await _db.Posts
+                .AsNoTracking()
+                .Select(p => new
+                {
+                    p.Id,
+                    p.ProductName,
+                    p.ImageUrls
+                })
                 .ToListAsync();
+
+            var vm = raw.Select(p => new PostRowViewModel
+            {
+                Id = p.Id,
+                ProductName = p.ProductName,
+                FirstImageUrl = (p.ImageUrls != null && p.ImageUrls.Count > 0) ? p.ImageUrls[0] : null,
+                ImageCount = p.ImageUrls?.Count ?? 0
+            })
+            .ToList();
 
             return View(vm);
         }
