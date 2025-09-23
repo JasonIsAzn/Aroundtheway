@@ -10,8 +10,6 @@ import {
   setQuantity,
   clearCart,
 } from "@/lib/cart";
-import { startCheckout } from "@/lib/checkout.client";
-
 const money = (cents, currency = "usd") =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -26,25 +24,10 @@ const SAMPLE_PRODUCTS = [
     imageUrl: "https://picsum.photos/seed/tee/600/600",
     currency: "usd",
   },
-  {
-    id: "comb-std",
-    name: "ATW Comb",
-    unitAmountCents: 1500,
-    imageUrl: "https://picsum.photos/seed/comb/600/600",
-    currency: "usd",
-  },
-  {
-    id: "hoodie-black",
-    name: "ATW Black Hoodie",
-    unitAmountCents: 5900,
-    imageUrl: "https://picsum.photos/seed/hoodie/600/600",
-    currency: "usd",
-  },
 ];
 
-export default function CheckoutPage() {
+export default function SampleProductPage() {
   const [cart, setCartState] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   // Initial load
   useEffect(() => {
@@ -82,30 +65,6 @@ export default function CheckoutPage() {
   const handleDirectQty = (id, val) => {
     const qty = Number.isFinite(+val) ? Math.max(0, Math.min(999, +val)) : 1;
     setCartState(setQuantity(id, qty));
-  };
-
-  const handlePay = async () => {
-    if (cart.length === 0) {
-      alert("Your cart is empty.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const items = cart.map((i) => ({
-        Name: i.name,
-        UnitAmountCents: i.unitAmountCents,
-        Quantity: i.quantity,
-        ImageUrl: i.imageUrl,
-        Currency: i.currency,
-      }));
-      const { url } = await startCheckout(items);
-      window.location.href = url; // Stripe Checkout redirect
-    } catch (err) {
-      console.error(err);
-      alert(err?.message || "Could not start checkout.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -216,18 +175,6 @@ export default function CheckoutPage() {
           <div className="text-lg font-semibold">{money(subtotalCents)}</div>
         </div>
       </section>
-
-      <button
-        onClick={handlePay}
-        disabled={loading || cart.length === 0}
-        className="rounded-lg px-4 py-2 bg-black text-white disabled:opacity-50"
-      >
-        {loading ? "Redirecting…" : "Pay with Stripe"}
-      </button>
-
-      <p className="text-xs text-gray-500">
-        Test card: 4242 4242 4242 4242 · any future date · any CVC
-      </p>
     </main>
   );
 }
