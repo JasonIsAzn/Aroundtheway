@@ -11,6 +11,7 @@ import {
   clearCart,
 } from "@/lib/cart";
 import { startCheckout } from "@/lib/checkout.client";
+import { getMe, updateMyAddress } from "@/lib/users.client"; // uses your apiFetch
 
 const money = (cents, currency = "usd") =>
   new Intl.NumberFormat("en-US", {
@@ -43,34 +44,64 @@ const SAMPLE_PRODUCTS = [
 ];
 
 export default function CheckoutPage() {
+  // cart
   const [cart, setCartState] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Initial load
+  // address form
+  const [formState, setFormState] = useState({
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+  });
+  const [addrErrors, setAddrErrors] = useState({});
+  const [isAddrSubmitting, setIsAddrSubmitting] = useState(false);
+  const [isAddrLoading, setIsAddrLoading] = useState(true);
+
+  // initial cart load
   useEffect(() => {
     setCartState(getCart());
   }, []);
 
-  // Stay in sync with other tabs / other parts of the app
+  // sync cart across tabs
   useEffect(() => {
     const onStorage = (e) => {
-      if (e.key === "atw_cart_v1") {
-        setCartState(getCart());
-      }
+      if (e.key === "atw_cart_v1") setCartState(getCart());
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  const subtotalCents = useMemo(() => {
-    return cart.reduce((sum, i) => sum + i.unitAmountCents * i.quantity, 0);
-  }, [cart]);
+  // load existing address
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const data = await getMe(); // GET /api/users/me
+        setFormState({
+          address: data.address?.address || "",
+          city: data.address?.city || "",
+          state: data.address?.state || "",
+          zipCode: data.address?.zipCode || "",
+          country: data.address?.country || "",
+        });
+      } catch (e) {
+        console.error("Failed to load address", e);
+      } finally {
+        setIsAddrLoading(false);
+      }
+    };
+    loadProfile();
+  }, []);
 
-  const handleAdd = (p) => {
-    const next = addItem(p, 1);
-    setCartState(next);
-  };
+  const subtotalCents = useMemo(
+    () => cart.reduce((sum, i) => sum + i.unitAmountCents * i.quantity, 0),
+    [cart]
+  );
 
+  // cart handlers
+  const handleAdd = (p) => setCartState(addItem(p, 1));
   const handleInc = (id) => setCartState(increment(id));
   const handleDec = (id) => setCartState(decrement(id));
   const handleRemove = (id) => setCartState(removeItem(id));
@@ -78,10 +109,59 @@ export default function CheckoutPage() {
     clearCart();
     setCartState([]);
   };
-
   const handleDirectQty = (id, val) => {
     const qty = Number.isFinite(+val) ? Math.max(0, Math.min(999, +val)) : 1;
     setCartState(setQuantity(id, qty));
+  };
+
+  // address form logic
+  const handleAddrChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({ ...prev, [name]: value }));
+    if (addrErrors[name])
+      setAddrErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  const validateAddrForm = () => {
+    let ok = true;
+    const next = {};
+    if (formState.zipCode && formState.zipCode.length > 20) {
+      next.zipCode = "ZIP/Postal code looks too long";
+      ok = false;
+    }
+    if (formState.state && formState.state.length > 100) {
+      next.state = "State/Province looks too long";
+      ok = false;
+    }
+    if (formState.country && formState.country.length > 100) {
+      next.country = "Country looks too long";
+      ok = false;
+    }
+    setAddrErrors(next);
+    return ok;
+  };
+
+  const handleSaveAddress = async (e) => {
+    e?.preventDefault?.();
+    if (!validateAddrForm()) return;
+
+    setIsAddrSubmitting(true);
+    try {
+      const payload = {
+        address: formState.address || null,
+        city: formState.city || null,
+        state: formState.state || null,
+        zipCode: formState.zipCode || null,
+        country: formState.country || null,
+      };
+      await updateMyAddress(payload); // PUT /api/users/me/address
+      alert("Address saved!");
+    } catch (e) {
+      console.error("Address update error:", e);
+      alert("Could not save address. Please try again.");
+    } finally {
+      setIsAddrSubmitting(false);
+    }
   };
 
   const handlePay = async () => {
@@ -89,6 +169,19 @@ export default function CheckoutPage() {
       alert("Your cart is empty.");
       return;
     }
+
+    // optional: require full address before paying
+    if (
+      !formState.address ||
+      !formState.city ||
+      !formState.state ||
+      !formState.zipCode ||
+      !formState.country
+    ) {
+      alert("Please complete your shipping address before paying.");
+      return;
+    }
+
     setLoading(true);
     try {
       const items = cart.map((i) => ({
@@ -112,7 +205,7 @@ export default function CheckoutPage() {
     <main className="mx-auto max-w-3xl p-6 space-y-8">
       <h1 className="text-2xl font-semibold">Checkout (Local Cart)</h1>
 
-      {/* Sample products with "Add to cart" */}
+      {/* Sample products */}
       <section className="space-y-3">
         <h2 className="text-lg font-medium">Sample Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -172,7 +265,6 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Quantity controls */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleDec(i.id)}
@@ -217,6 +309,143 @@ export default function CheckoutPage() {
         </div>
       </section>
 
+      {/* Address form ONLY */}
+      <section className="rounded-xl border p-4">
+        <h2 className="text-lg font-medium">Shipping Address</h2>
+
+        {isAddrLoading ? (
+          <p className="text-sm text-gray-500 mt-2">Loading address…</p>
+        ) : (
+          <form onSubmit={handleSaveAddress} className="mt-4 space-y-4">
+            <div>
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Street Address
+              </label>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                value={formState.address}
+                onChange={handleAddrChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your street address"
+              />
+              {addrErrors.address && (
+                <p className="mt-1 text-sm text-red-600">
+                  {addrErrors.address}
+                </p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div>
+                <label
+                  htmlFor="city"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  City
+                </label>
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  value={formState.city}
+                  onChange={handleAddrChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
+                  placeholder="City"
+                />
+                {addrErrors.city && (
+                  <p className="mt-1 text-sm text-red-600">{addrErrors.city}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="state"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  State/Province
+                </label>
+                <input
+                  id="state"
+                  name="state"
+                  type="text"
+                  value={formState.state}
+                  onChange={handleAddrChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
+                  placeholder="State"
+                />
+                {addrErrors.state && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {addrErrors.state}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="zipCode"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  ZIP/Postal Code
+                </label>
+                <input
+                  id="zipCode"
+                  name="zipCode"
+                  type="text"
+                  value={formState.zipCode}
+                  onChange={handleAddrChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
+                  placeholder="ZIP Code"
+                />
+                {addrErrors.zipCode && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {addrErrors.zipCode}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="country"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Country
+              </label>
+              <input
+                id="country"
+                name="country"
+                type="text"
+                value={formState.country}
+                onChange={handleAddrChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm sm:text-sm"
+                placeholder="Enter your country"
+              />
+              {addrErrors.country && (
+                <p className="mt-1 text-sm text-red-600">
+                  {addrErrors.country}
+                </p>
+              )}
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isAddrSubmitting}
+                className="rounded-lg px-4 py-2 bg-blue-600 text-white disabled:opacity-50"
+              >
+                {isAddrSubmitting ? "Saving…" : "Save Address"}
+              </button>
+            </div>
+          </form>
+        )}
+      </section>
+
+      {/* Pay */}
       <button
         onClick={handlePay}
         disabled={loading || cart.length === 0}
