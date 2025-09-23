@@ -1,0 +1,262 @@
+@model Aroundtheway.Api.ViewModels.Admin.UsersViewModel
+
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <!-- Page header -->
+    <div class="pb-5 border-b border-gray-200">
+        <h3 class="text-2xl font-light tracking-wide uppercase text-gray-900">User Management</h3>
+        <p class="mt-2 text-sm text-gray-600">
+            Manage user accounts and permissions
+        </p>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="bg-white border border-gray-200 shadow overflow-hidden sm:rounded-lg p-4">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <!-- Search -->
+            <div class="flex-1 min-w-[300px]">
+                <div class="relative rounded-md">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="search"
+                        class="focus:ring-black focus:border-black block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                        placeholder="Search users..." />
+                </div>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div id="bulkActions" style="display: none;" class="flex items-center space-x-4">
+                <select id="bulkAction"
+                    class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-black focus:border-black sm:text-sm rounded-md">
+                    <option value="delete">Delete Selected</option>
+                    <option value="promote">Promote to Admin</option>
+                    <option value="demote">Remove Admin Role</option>
+                </select>
+                <button type="button" id="applyBulkAction"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm uppercase tracking-wide font-light rounded-md shadow-sm text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    Apply
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div class="bg-white border border-gray-200 overflow-hidden rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-muted-foreground truncate">Total Users</dt>
+                            <dd class="text-2xl font-semibold text-foreground">@Model.Users.Count()</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 overflow-hidden rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-muted-foreground truncate">Admins</dt>
+                            <dd class="text-2xl font-semibold text-foreground">
+                                @Model.Users.Count(u => u.IsAdmin)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 overflow-hidden rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-gray-500" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.36 14.3c-1.43-1.74-3.5-2.76-5.36-2.76s-3.93 1.02-5.36 2.76c-1.49-1.63-2.4-3.8-2.4-6.3 0-5.37 4.39-9.76 9.76-9.76s9.76 4.39 9.76 9.76c0 2.5-.91 4.67-2.4 6.3z"
+                                stroke="currentColor" stroke-width="2" fill="none" />
+                        </svg>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-muted-foreground truncate">Google Users</dt>
+                            <dd class="text-2xl font-semibold text-foreground">
+                                @Model.Users.Count(u => !string.IsNullOrEmpty(u.GoogleSub))
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users table -->
+    <div class="bg-white border border-gray-200 shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+            <div>
+                <h3 class="text-lg tracking-wide uppercase font-light text-gray-900">Users</h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-600">
+                    A list of all users including their email, role, and registration date.
+                </p>
+            </div>
+            <div class="flex items-center">
+                <input type="checkbox" id="selectAll"
+                    class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded" />
+                <span class="ml-2 text-sm text-gray-600" id="selectionCount">Select all</span>
+            </div>
+        </div>
+
+        <ul class="divide-y divide-border">
+            @foreach (var user in Model.Users)
+            {
+                <li id="user-@user.Id">
+                    <div class="px-4 py-4 sm:px-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <input type="checkbox" data-user-id="@user.Id"
+                                        class="h-4 w-4 text-black focus:ring-black border-gray-300 rounded userCheckbox" />
+                                </div>
+                                <div class="flex-shrink-0 ml-4">
+                                    <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                        <span class="text-sm font-medium text-gray-900">
+                                            @user.Email[0].ToString().ToUpper()
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="flex items-center">
+                                        <p class="text-sm font-medium text-gray-900">@user.Email</p>
+                                        @if (user.IsAdmin)
+                                        {
+                                            <span
+                                                class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Admin
+                                            </span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(user.GoogleSub))
+                                        {
+                                            <span
+                                                class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                Google
+                                            </span>
+                                        }
+                                    </div>
+                                    <div class="flex items-center text-sm text-gray-600">
+                                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-muted-foreground" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <p>Joined @user.CreatedAt.ToString("MMM d, yyyy")</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const search = document.getElementById('search');
+            const userList = document.querySelectorAll('li[id^="user-"]');
+            const selectAll = document.getElementById('selectAll');
+            const selectionCount = document.getElementById('selectionCount');
+            const bulkActions = document.getElementById('bulkActions');
+            const applyBulkAction = document.getElementById('applyBulkAction');
+            const bulkAction = document.getElementById('bulkAction');
+
+            // Search functionality
+            search.addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                userList.forEach(userItem => {
+                    const email = userItem.querySelector('p.text-sm.font-medium').textContent.toLowerCase();
+                    userItem.style.display = email.includes(searchTerm) ? '' : 'none';
+                });
+            });
+
+            // Selection functionality
+            function updateSelectionCount() {
+                const selectedCount = document.querySelectorAll('.userCheckbox:checked').length;
+                if (selectedCount > 0) {
+                    selectionCount.textContent = `${selectedCount} selected`;
+                    bulkActions.style.display = 'flex';
+                } else {
+                    selectionCount.textContent = 'Select all';
+                    bulkActions.style.display = 'none';
+                }
+                selectAll.checked = selectedCount === userList.length;
+            }
+
+            selectAll.addEventListener('change', function (e) {
+                document.querySelectorAll('.userCheckbox').forEach(checkbox => {
+                    checkbox.checked = e.target.checked;
+                });
+                updateSelectionCount();
+            });
+
+            document.querySelectorAll('.userCheckbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectionCount);
+            });
+
+            // Bulk actions
+            applyBulkAction.addEventListener('click', async function () {
+                const selectedIds = Array.from(document.querySelectorAll('.userCheckbox:checked'))
+                    .map(checkbox => checkbox.dataset.userId);
+
+                if (!selectedIds.length) return;
+
+                const action = bulkAction.value;
+                const endpoint = action === 'delete'
+                    ? '/api/admin/users/bulk-delete'
+                    : action === 'promote'
+                        ? '/api/admin/users/bulk-promote'
+                        : '/api/admin/users/bulk-demote';
+
+                try {
+                    applyBulkAction.disabled = true;
+                    applyBulkAction.textContent = 'Processing...';
+
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userIds: selectedIds })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to perform bulk action');
+
+                    // Refresh page to show updated data
+                    window.location.reload();
+                } catch (err) {
+                    console.error('Failed to perform bulk action:', err);
+                    alert('Failed to perform action. Please try again.');
+                } finally {
+                    applyBulkAction.disabled = false;
+                    applyBulkAction.textContent = 'Apply';
+                }
+            });
+        });
+    </script>
+}
