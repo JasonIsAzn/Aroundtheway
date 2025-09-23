@@ -69,7 +69,7 @@ public class AdminController : Controller
         await _context.SaveChangesAsync();
 
         TempData["Success"] = $"Promoted {target.Email} to admin.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Users));
     }
 
     [HttpPost("demote/{id}")]
