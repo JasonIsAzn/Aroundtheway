@@ -6,59 +6,7 @@
 
 <div class="min-h-screen bg-gray-50 py-8">
     <div class="max-w-4xl mx-auto px-4">
-        <h1 class="text-3xl font-light uppercase tracking-widest text-center text-black mb-8">
-            Image Upload Test
-        </h1>
 
-        <!-- API Info -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-            <p class="text-blue-800 text-sm font-medium mb-2">API Endpoints Available:</p>
-            <ul class="text-blue-700 text-sm space-y-1">
-                <li>• Single Upload: POST /api/ProductImage/upload/{productId}</li>
-                <li>• Multiple Upload: POST /api/ProductImage/upload-multiple/{productId}</li>
-                <li>• Get Images: GET /api/ProductImage/{productId}/images</li>
-            </ul>
-        </div>
-
-        <!-- Single Image Upload -->
-        <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-            <h3 class="text-xl font-medium uppercase tracking-wide text-black mb-6">Single Image Upload</h3>
-            <form id="singleUploadForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
-                        Product ID:
-                    </label>
-                    <input
-                        type="text"
-                        id="productId"
-                        value="test-product-001"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                        required
-                    >
-                </div>
-                <div>
-                    <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
-                        Select Image:
-                    </label>
-                    <input
-                        type="file"
-                        id="singleFile"
-                        accept="image/*"
-                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800"
-                        required
-                    >
-                    <div id="singleFileInfo" class="hidden mt-3 p-3 bg-gray-50 rounded-md text-sm text-gray-700"></div>
-                </div>
-                <button
-                    type="submit"
-                    id="singleUploadBtn"
-                    class="w-full py-3 px-6 bg-black text-white uppercase tracking-wider text-sm font-medium rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                >
-                    Upload Single Image
-                </button>
-            </form>
-            <div id="singleResult" class="mt-6"></div>
-        </div>
 
         <!-- Multiple Images Upload -->
         <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
@@ -68,33 +16,22 @@
                     <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
                         Product ID:
                     </label>
-                    <input
-                        type="text"
-                        id="productIdMultiple"
-                        value="test-product-002"
+                    <input type="text" id="productIdMultiple" value="test-product-002"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                        required
-                    >
+                        required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium uppercase tracking-wide text-black mb-2">
                         Select Images (Max 10):
                     </label>
-                    <input
-                        type="file"
-                        id="multipleFiles"
-                        accept="image/*"
-                        multiple
+                    <input type="file" id="multipleFiles" accept="image/*" multiple
                         class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800"
-                        required
-                    >
-                    <div id="multipleFileInfo" class="hidden mt-3 p-3 bg-gray-50 rounded-md text-sm text-gray-700"></div>
+                        required>
+                    <div id="multipleFileInfo" class="hidden mt-3 p-3 bg-gray-50 rounded-md text-sm text-gray-700">
+                    </div>
                 </div>
-                <button
-                    type="submit"
-                    id="multipleUploadBtn"
-                    class="w-full py-3 px-6 bg-black text-white uppercase tracking-wider text-sm font-medium rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                >
+                <button type="submit" id="multipleUploadBtn"
+                    class="w-full py-3 px-6 bg-black text-white uppercase tracking-wider text-sm font-medium rounded-md hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
                     Upload Multiple Images
                 </button>
             </form>
@@ -105,7 +42,7 @@
 
 <script>
     // File info display
-    document.getElementById('singleFile').addEventListener('change', function(e) {
+    document.getElementById('singleFile').addEventListener('change', function (e) {
         const file = e.target.files[0];
         const info = document.getElementById('singleFileInfo');
         if (file) {
@@ -120,7 +57,7 @@
         }
     });
 
-    document.getElementById('multipleFiles').addEventListener('change', function(e) {
+    document.getElementById('multipleFiles').addEventListener('change', function (e) {
         const files = e.target.files;
         const info = document.getElementById('multipleFileInfo');
         if (files.length > 0) {
@@ -139,7 +76,7 @@
     });
 
     // Single upload form
-    document.getElementById('singleUploadForm').addEventListener('submit', async function(e) {
+    document.getElementById('singleUploadForm').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const btn = document.getElementById('singleUploadBtn');
@@ -204,7 +141,7 @@
     });
 
     // Multiple upload form
-    document.getElementById('multipleUploadForm').addEventListener('submit', async function(e) {
+    document.getElementById('multipleUploadForm').addEventListener('submit', async function (e) {
         e.preventDefault();
 
         const btn = document.getElementById('multipleUploadBtn');
@@ -282,9 +219,9 @@
 
     // Copy to clipboard function
     function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
+        navigator.clipboard.writeText(text).then(function () {
             alert('URL copied to clipboard!');
-        }, function(err) {
+        }, function (err) {
             console.error('Could not copy text: ', err);
         });
     }

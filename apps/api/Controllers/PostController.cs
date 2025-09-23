@@ -1,22 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http; // for HttpContext.Session
-using Aroundtheway.Api.Data;     // AppDbContext from Program.cs
+using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.ViewModels.Post;
+using System.Text.RegularExpressions;
+using Aroundtheway.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Aroundtheway.Api.Controllers
 {
     // All routes under /posts/...
     [Route("posts")]
+    [Authorize(Policy = "AdminOnly")]
     public class PostController : Controller
     {
         private readonly AppDbContext _db;
+        private readonly IImageStorageService _imageStorageService;
+        private readonly ILogger<ProductImageController> _logger;
         private const string SessionUserIdKey = "SessionUserId";
 
-        public PostController(AppDbContext db)
+
+        public PostController(AppDbContext db, IImageStorageService imageStorageService, ILogger<ProductImageController> logger)
         {
             _db = db;
+            _imageStorageService = imageStorageService;
+            _logger = logger;
         }
 
         // GET /posts/new
@@ -29,26 +37,71 @@ namespace Aroundtheway.Api.Controllers
             return View(new PostFormViewModel());
         }
 
-        // POST /posts/create
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePost(PostFormViewModel vm)
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(50_000_000)]
+        public async Task<IActionResult> CreatePost([FromForm] PostFormViewModel vm)
         {
-            var userId = HttpContext.Session.GetInt32(SessionUserIdKey);
-            if (userId is not int uid) return Unauthorized();
+            var sessionUserId = HttpContext.Session.GetInt32(SessionUserIdKey);
+            if (sessionUserId is not int uid) return Unauthorized();
 
-            // normalize
             vm.ProductName = (vm.ProductName ?? "").Trim();
             vm.Color = (vm.Color ?? "").Trim();
 
+            // We populate ImageUrls after upload; remove it from model validation
+            ModelState.Remove(nameof(vm.ImageUrls));
+
+            var hasFiles = vm.Images?.Any(f => f is { Length: > 0 }) == true;
+            var hasUrls = vm.ImageUrls?.Any(u => !string.IsNullOrWhiteSpace(u)) == true;
+            if (!hasFiles && !hasUrls)
+                ModelState.AddModelError("Images", "Please select at least one image.");
+
             if (!ModelState.IsValid) return View("NewPostForm", vm);
 
-            // parse numeric fields coming as strings from the VM
+            // Parse numeric strings
             double.TryParse(vm.Price, out var price);
             int.TryParse(vm.NumOfSmall, out var s);
             int.TryParse(vm.NumOfMedium, out var m);
             int.TryParse(vm.NumOfLarge, out var l);
             int.TryParse(vm.NumOfXLarge, out var xl);
+
+            // Files from binder
+            var files = vm.Images?.Where(f => f is { Length: > 0 }).ToList() ?? new List<IFormFile>();
+            if (files.Count > 10)
+            {
+                ModelState.AddModelError("Images", "You can upload at most 10 images.");
+                return View("NewPostForm", vm);
+            }
+            if (files.Any(f => !f.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase)))
+            {
+                ModelState.AddModelError("Images", "All files must be images.");
+                return View("NewPostForm", vm);
+            }
+
+            // Slug + uniqueness
+            var productId = GenerateProductId(vm.ProductName, files.FirstOrDefault()?.FileName);
+            productId = await EnsureUniqueProductIdAsync(productId);
+
+            // Upload
+            var uploadedUrls = new List<string>();
+            if (files.Count > 0)
+            {
+                var results = await _imageStorageService.UploadMultipleImagesAsync(files, productId);
+                foreach (var item in results)
+                {
+                    uploadedUrls.Add(
+                        Uri.IsWellFormedUriString(item, UriKind.Absolute)
+                            ? item
+                            : await _imageStorageService.GetImageUrlAsync(item)
+                    );
+                }
+            }
+
+            var allUrls = (vm.ImageUrls ?? new List<string>())
+                          .Concat(uploadedUrls)
+                          .Distinct()
+                          .ToList();
 
             var post = new Post
             {
@@ -59,8 +112,9 @@ namespace Aroundtheway.Api.Controllers
                 NumOfMedium = m,
                 NumOfLarge = l,
                 NumOfXLarge = xl,
-                ImageUrls = vm.ImageUrls ?? new List<string>(),
-                UserId = uid
+                ImageUrls = allUrls,
+                UserId = uid,
+                ProductId = productId
             };
 
             await _db.Posts.AddAsync(post);
@@ -68,6 +122,7 @@ namespace Aroundtheway.Api.Controllers
 
             return RedirectToAction(nameof(PostIndex));
         }
+
 
         // GET /posts/{id}
         [HttpGet("{id:int}")]
@@ -98,7 +153,6 @@ namespace Aroundtheway.Api.Controllers
                 NumOfMedium = post.NumOfMedium.ToString(),
                 NumOfLarge = post.NumOfLarge.ToString(),
                 NumOfXLarge = post.NumOfXLarge.ToString(),
-                ImageUrls = post.ImageUrls ?? new List<string>()
             };
 
             return View(vm);
@@ -130,7 +184,6 @@ namespace Aroundtheway.Api.Controllers
 
             post.ProductName = vm.ProductName;
             post.Color = vm.Color;
-            post.ImageUrls = vm.ImageUrls ?? new List<string>();
             post.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
@@ -195,5 +248,45 @@ namespace Aroundtheway.Api.Controllers
 
             return View(vm);
         }
+
+
+
+        // ---------- helpers for productId slugging ----------
+
+        private async Task<string> EnsureUniqueProductIdAsync(string baseId)
+        {
+            var candidate = baseId;
+            var tries = 0;
+            while (await _db.Posts.AsNoTracking().AnyAsync(p => p.ProductId == candidate))
+            {
+                tries++;
+                candidate = $"{baseId}-{tries}";
+                if (tries > 10)
+                {
+                    candidate = $"{baseId}-{ShortRandom()}";
+                    break;
+                }
+            }
+            return candidate;
+        }
+
+        private static string GenerateProductId(string? nameSeed, string? imageFileNameSeed)
+        {
+            var seed = (nameSeed ?? "").Trim();
+            if (string.IsNullOrWhiteSpace(seed) && !string.IsNullOrWhiteSpace(imageFileNameSeed))
+                seed = Path.GetFileNameWithoutExtension(imageFileNameSeed);
+
+            if (string.IsNullOrWhiteSpace(seed)) seed = "product";
+
+            seed = seed.ToLowerInvariant();
+            seed = Regex.Replace(seed, @"[^a-z0-9]+", "-");
+            seed = Regex.Replace(seed, @"-+", "-").Trim('-');
+            if (seed.Length > 40) seed = seed[..40].Trim('-');
+
+            return $"{seed}-{ShortRandom()}";
+        }
+
+        private static string ShortRandom(int len = 6) => Guid.NewGuid().ToString("N")[..len].ToLowerInvariant();
+
     }
 }
