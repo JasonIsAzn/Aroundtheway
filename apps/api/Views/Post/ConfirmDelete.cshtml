@@ -1,0 +1,14 @@
+@using Aroundtheway.Api.ViewModels.Post
+@model ConfirmDeleteViewModel
+
+@{
+    ViewData["Title"] = "Confirm Deletion";
+}
+
+<h1 class="display-4">Delete Post</h1>
+
+<p class="lead">Are you sure you want to delete @Model.ProductName? This action is not reversable.</p>
+
+<form asp-action="DeletePost" asp-controller="Post" asp-route-id="@Model.Id">
+    <button type="submit" class="btn btn-danger">Delete POst</button>
+</form>

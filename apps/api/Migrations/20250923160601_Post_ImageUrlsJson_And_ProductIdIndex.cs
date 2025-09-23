@@ -1,0 +1,68 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Aroundtheway.Api.Migrations
+{
+    /// <inheritdoc />
+    public partial class Post_ImageUrlsJson_And_ProductIdIndex : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterColumn<string>(
+                name: "ProductId",
+                table: "Posts",
+                type: "varchar(255)",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "longtext")
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "ImageUrls",
+                table: "Posts",
+                type: "LONGTEXT",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "longtext")
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_ProductId",
+                table: "Posts",
+                column: "ProductId",
+                unique: true);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropIndex(
+                name: "IX_Posts_ProductId",
+                table: "Posts");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "ProductId",
+                table: "Posts",
+                type: "longtext",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "varchar(255)")
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "ImageUrls",
+                table: "Posts",
+                type: "longtext",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "LONGTEXT")
+                .Annotation("MySql:CharSet", "utf8mb4")
+                .OldAnnotation("MySql:CharSet", "utf8mb4");
+        }
+    }
+}
