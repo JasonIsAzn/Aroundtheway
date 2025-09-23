@@ -16,15 +16,13 @@ namespace Aroundtheway.Api.Controllers
     {
         private readonly AppDbContext _db;
         private readonly IImageStorageService _imageStorageService;
-        private readonly ILogger<ProductImageController> _logger;
         private const string SessionUserIdKey = "SessionUserId";
 
 
-        public PostController(AppDbContext db, IImageStorageService imageStorageService, ILogger<ProductImageController> logger)
+        public PostController(AppDbContext db, IImageStorageService imageStorageService)
         {
             _db = db;
             _imageStorageService = imageStorageService;
-            _logger = logger;
         }
 
         // GET /posts/new
