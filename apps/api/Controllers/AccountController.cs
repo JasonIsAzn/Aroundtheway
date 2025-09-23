@@ -34,6 +34,7 @@ public class AccountController : Controller
         if (!string.IsNullOrEmpty(message))
             ViewData["Message"] = message;
         return View(new LoginFormViewModel { Error = error });
+    }
 
     [HttpGet("logout")]
     public IActionResult Logout()
