@@ -1,5 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  content: ["./Views/**/*.cshtml"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
   content: [
     "./Views/**/*.cshtml",
     "./Views/Shared/**/*.cshtml"

@@ -1,4 +1,65 @@
 @{
+    ViewData["Title"] = "Dev Debug Area";
+}
+
+<div class="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="text-center">
+        <h1 class="text-2xl font-light tracking-wide uppercase text-black">
+            Dev Debug Area
+        </h1>
+        <p class="mt-2 text-sm text-gray-600">
+            Development and debugging tools
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-8 px-4 sm:rounded-lg sm:px-10 space-y-6">
+            <!-- DB Ping -->
+            <a href="/dbping" class="block w-full py-2 px-4 border border-black text-sm font-light uppercase tracking-wide text-center text-black hover:bg-black hover:text-white transition-colors rounded-md">
+                DB Ping
+            </a>
+
+            <!-- Login Page -->
+            <a href="/account/login" class="block w-full py-2 px-4 border border-black text-sm font-light uppercase tracking-wide text-center text-black hover:bg-black hover:text-white transition-colors rounded-md">
+                Login Page
+            </a>
+
+            <!-- View Users -->
+            <a href="/admin" class="block w-full py-2 px-4 border border-black text-sm font-light uppercase tracking-wide text-center text-black hover:bg-black hover:text-white transition-colors rounded-md">
+                View Users
+            </a>
+        </div>
+    </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Check database status on page load
+        document.addEventListener('DOMContentLoaded', async function () {
+            try {
+                const response = await fetch('/api/status/db');
+                const data = await response.json();
+                const dbStatusText = document.getElementById('dbStatusText');
+                
+                if (data.status === 'connected') {
+                    dbStatusText.className = 'text-sm text-green-600';
+                    dbStatusText.textContent = 'Database is connected';
+                } else {
+                    dbStatusText.className = 'text-sm text-red-600';
+                    dbStatusText.textContent = 'Database connection issue';
+                }
+            } catch (err) {
+                console.error('Failed to check database status:', err);
+                const dbStatusText = document.getElementById('dbStatusText');
+                dbStatusText.className = 'text-sm text-red-600';
+                dbStatusText.textContent = 'Failed to check status';
+            }
+        });
+    </script>
+}
+
+@{
     ViewData["Title"] = "Debug Tools";
 }
 

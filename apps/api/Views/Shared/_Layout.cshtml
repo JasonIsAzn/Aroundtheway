@@ -1,16 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Aroundtheway.Api</title>
+    <title>@ViewData["Title"] - Aroundtheway Admin</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
 </head>
-
-<body>
-    <main>
+<body class="min-h-screen bg-white">
+    <partial name="_Nav" />
+    <main class="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         @RenderBody()
     </main>
 
@@ -18,5 +17,4 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-
 </html>
