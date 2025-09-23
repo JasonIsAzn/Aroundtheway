@@ -1,0 +1,86 @@
+@{
+    ViewData["Title"] = "Image Upload Test";
+}
+
+<div class="sm:mx-auto sm:w-full max-w-[420px]">
+    <h2 class="mt-6 text-center text-lg font-light tracking-[.15em] uppercase text-black">
+        Image Upload Test
+    </h2>
+</div>
+
+<div class="mt-8 sm:mx-auto sm:w-full max-w-[420px]">
+    <div class="py-8 px-4">
+        <form id="uploadForm" class="space-y-6">
+            <div>
+                <label class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                    Choose Image
+                </label>
+                <input type="file" id="imageInput" accept="image/*"
+                    class="mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" />
+            </div>
+
+            <div id="imagePreview" class="hidden">
+                <img id="preview" src="#" alt="Preview" class="w-full h-auto rounded-md" />
+            </div>
+
+            <button type="submit"
+                class="w-full py-[10px] text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 focus:outline-none transition-colors">
+                Upload Image
+            </button>
+        </form>
+
+        <div id="uploadStatus" class="mt-4 text-center text-sm"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('imageInput').onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        };
+
+        document.getElementById('uploadForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const status = document.getElementById('uploadStatus');
+            const file = document.getElementById('imageInput').files[0];
+            
+            if (!file) {
+                status.textContent = 'Please select an image';
+                status.className = 'mt-4 text-center text-sm text-red-600';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                status.textContent = 'Uploading...';
+                status.className = 'mt-4 text-center text-sm text-black/60';
+
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    status.textContent = 'Upload successful';
+                    status.className = 'mt-4 text-center text-sm text-green-600';
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                status.textContent = 'Upload failed. Please try again.';
+                status.className = 'mt-4 text-center text-sm text-red-600';
+            }
+        };
+    </script>
+}
