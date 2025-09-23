@@ -27,6 +27,49 @@ public class AuthController : Controller
     }
 
     [HttpPost("register")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> RegisterWeb([FromForm] RegisterFormViewModel vm)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View("../Account/Register", vm);
+        }
+
+        var email = (vm.Email ?? "").Trim().ToLowerInvariant();
+        var password = (vm.Password ?? "").Trim();
+
+        if (password != vm.ConfirmPassword)
+        {
+            ModelState.AddModelError("", "Passwords do not match.");
+            return View("../Account/Register", vm);
+        }
+
+        if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == email))
+        {
+            ModelState.AddModelError("", "Email already in use.");
+            return View("../Account/Register", vm);
+        }
+
+        var user = await HandleRegister(email, password);
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Email),
+            new(ClaimTypes.Email, user.Email)
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        var props = new AuthenticationProperties { IsPersistent = true, AllowRefresh = true };
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+        HttpContext.Session.SetInt32("SessionUserId", user.Id);
+
+        return RedirectToAction("Index", "Home");
+    }
+
+    [HttpPost("register")]
     [Consumes("application/json")]
     public async Task<IActionResult> RegisterApi(RegisterRequest dto)
     {

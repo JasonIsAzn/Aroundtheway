@@ -86,6 +86,7 @@ builder.Services.AddScoped<Supabase.Client>(provider =>
 });
 
 builder.Services.AddScoped<IImageStorageService, S3ImageStorageService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
