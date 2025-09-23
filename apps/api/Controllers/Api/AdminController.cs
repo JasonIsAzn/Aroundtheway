@@ -8,7 +8,7 @@ namespace Aroundtheway.Api.Controllers.Api;
 
 [ApiController]
 [Route("api/admin")]
-[Authorize(Roles = "admin")]
+[Authorize(Policy = "AdminOnly")]
 public class AdminController : Controller
 {
     private readonly AppDbContext _context;

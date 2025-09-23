@@ -56,13 +56,13 @@ public class AdminController : Controller
         if (target == null)
         {
             TempData["Error"] = "User not found.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Users));
         }
 
         if (target.IsAdmin)
         {
             TempData["Info"] = "User is already an admin.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Users));
         }
 
         target.IsAdmin = true;
@@ -87,20 +87,20 @@ public class AdminController : Controller
         if (target == null)
         {
             TempData["Error"] = "User not found.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Users));
         }
 
         if (!target.IsAdmin)
         {
             TempData["Info"] = "User is not an admin.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Users));
         }
 
         var adminCount = await _context.Users.CountAsync(u => u.IsAdmin);
         if (adminCount <= 1)
         {
             TempData["Error"] = "Cannot demote the last remaining admin.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Users));
         }
 
         target.IsAdmin = false;
