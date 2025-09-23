@@ -30,9 +30,20 @@ public class AuthController : Controller
     [Consumes("application/json")]
     public async Task<IActionResult> RegisterApi(RegisterRequest dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Title = "Validation failed",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = string.Join(", ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage))
+            });
+        }
+
         var email = (dto.Email ?? "").Trim().ToLowerInvariant();
         var password = (dto.Password ?? "").Trim();
-
 
         if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == email))
             return Conflict(new ProblemDetails
