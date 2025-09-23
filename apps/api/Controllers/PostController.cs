@@ -140,7 +140,7 @@ namespace Aroundtheway.Api.Controllers
             var userId = HttpContext.Session.GetInt32(SessionUserIdKey);
             if (userId is not int uid) return Unauthorized();
 
-            var post = await _db.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
+            var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
             if (post is null) return NotFound();
             if (post.UserId != uid) return Forbid();
 
@@ -153,20 +153,23 @@ namespace Aroundtheway.Api.Controllers
                 NumOfMedium = post.NumOfMedium.ToString(),
                 NumOfLarge = post.NumOfLarge.ToString(),
                 NumOfXLarge = post.NumOfXLarge.ToString(),
+                ImageUrls = post.ImageUrls
             };
 
-            return View(vm);
+            ViewBag.PostId = id;
+            return View("EditPostForm", vm);
         }
+
 
         // POST /posts/{id}/update
         [HttpPost("{id:int}/update")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdatePost(int id, PostFormViewModel vm)
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(50_000_000)]
+        public async Task<IActionResult> UpdatePost(int id, [FromForm] PostFormViewModel vm)
         {
             var userId = HttpContext.Session.GetInt32(SessionUserIdKey);
             if (userId is not int uid) return Unauthorized();
-
-            if (!ModelState.IsValid) return View(nameof(EditPostForm), vm);
 
             var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
             if (post is null) return NotFound();
@@ -175,7 +178,10 @@ namespace Aroundtheway.Api.Controllers
             vm.ProductName = (vm.ProductName ?? "").Trim();
             vm.Color = (vm.Color ?? "").Trim();
 
-            // parse with fallbacks to keep previous values if parse fails
+            ModelState.Remove(nameof(vm.ImageUrls));
+            if (!ModelState.IsValid) { ViewBag.PostId = id; return View("EditPostForm", vm); }
+
+
             if (double.TryParse(vm.Price, out var price)) post.Price = price;
             if (int.TryParse(vm.NumOfSmall, out var s)) post.NumOfSmall = s;
             if (int.TryParse(vm.NumOfMedium, out var m)) post.NumOfMedium = m;
@@ -184,6 +190,41 @@ namespace Aroundtheway.Api.Controllers
 
             post.ProductName = vm.ProductName;
             post.Color = vm.Color;
+
+
+            var removeSet = Request.Form["ImageUrlsToRemove"].ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var remainingUrls = (post.ImageUrls ?? [])
+                .Where(u => !removeSet.Contains(u))
+                .ToList();
+
+            // upload any new images (keep existing productId)
+            var files = vm.Images?.Where(f => f is { Length: > 0 }).ToList() ?? new List<IFormFile>();
+            if (files.Count > 10)
+            {
+                ModelState.AddModelError("Images", "You can upload at most 10 images.");
+                ViewBag.PostId = id; return View("EditPostForm", vm);
+            }
+            if (files.Any(f => !f.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase)))
+            {
+                ModelState.AddModelError("Images", "All files must be images.");
+                ViewBag.PostId = id; return View("EditPostForm", vm);
+            }
+
+            var uploadedUrls = new List<string>();
+            if (files.Count > 0)
+            {
+                var results = await _imageStorageService.UploadMultipleImagesAsync(files, post.ProductId);
+                foreach (var item in results)
+                {
+                    uploadedUrls.Add(
+                        Uri.IsWellFormedUriString(item, UriKind.Absolute)
+                            ? item
+                            : await _imageStorageService.GetImageUrlAsync(item)
+                    );
+                }
+            }
+
+            post.ImageUrls = remainingUrls.Concat(uploadedUrls).Distinct().ToList();
             post.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
