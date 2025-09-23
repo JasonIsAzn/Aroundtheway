@@ -18,12 +18,22 @@ public class AccountController : Controller
         _passwords = passwords;
     }
 
+    [HttpGet("register")]
+    public IActionResult Register(string? message)
+    {
+        ViewData["Title"] = "Register";
+        if (!string.IsNullOrEmpty(message))
+            ViewData["Message"] = message;
+        return View();
+    }
+
     [HttpGet("login")]
-    public IActionResult Login(string? error)
+    public IActionResult Login(string? error, string? message)
     {
         ViewData["Title"] = "Login";
+        if (!string.IsNullOrEmpty(message))
+            ViewData["Message"] = message;
         return View(new LoginFormViewModel { Error = error });
-    }
 
     [HttpGet("logout")]
     public IActionResult Logout()

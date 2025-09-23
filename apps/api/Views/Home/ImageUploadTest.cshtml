@@ -1,0 +1,98 @@
+@{
+    ViewData["Title"] = "Image Upload Test";
+}
+
+<div class="container">
+    <h2>Image Upload Test</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <form id="uploadForm" class="mb-4">
+                <div class="form-group">
+                    <label for="productId">Product ID</label>
+                    <input type="text" class="form-control" id="productId" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imageFile">Select Image</label>
+                    <input type="file" class="form-control" id="imageFile" accept="image/*" required>
+                </div>
+                
+                <div class="mt-3">
+                    <img id="preview" style="max-width: 100%; display: none;" class="mb-3">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Upload Image</button>
+            </form>
+        </div>
+        
+        <div class="col-md-6">
+            <div id="uploadStatus"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const imageFile = document.getElementById('imageFile');
+        const preview = document.getElementById('preview');
+        const uploadStatus = document.getElementById('uploadStatus');
+        
+        // Show image preview
+        imageFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Handle form submission
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const productId = document.getElementById('productId').value;
+            const file = imageFile.files[0];
+            
+            if (!file) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            uploadStatus.innerHTML = '<div class="alert alert-info">Uploading image...</div>';
+            
+            try {
+                const response = await fetch(`/api/images/upload/${productId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Upload failed');
+                }
+                
+                uploadStatus.innerHTML = `
+                    <div class="alert alert-success">
+                        <p>Upload successful!</p>
+                        <p>File name: ${result.fileName}</p>
+                        <p>URL: <a href="${result.url}" target="_blank">${result.url}</a></p>
+                    </div>`;
+            } catch (error) {
+                uploadStatus.innerHTML = `
+                    <div class="alert alert-danger">
+                        ${error.message || 'Failed to upload image'}
+                    </div>`;
+            }
+        });
+    </script>
+}
