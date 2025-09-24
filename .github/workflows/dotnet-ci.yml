@@ -1,0 +1,57 @@
+name: .NET CI
+
+on:
+  pull_request:
+    branches: ["**"] # run on all PRs
+  push:
+    branches: [main] # (optional) also run on main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      # Safety: your app tries to read these; factory overrides them, but set anyway
+      OPENAI_API_KEY: "test"
+      AWS__AccessKey: "test"
+      AWS__SecretKey: "test"
+      AWS__ServiceURL: "http://localhost"
+      Supabase__Url: "http://localhost"
+      Supabase__Key: "test"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (Release)
+        run: dotnet build --no-restore -c Release
+
+      - name: Test (with coverage)
+        run: dotnet test --no-build -c Release -v n --collect:"XPlat Code Coverage"
+
+      # (optional) Upload coverage result
+      - name: Publish coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: |
+            **/TestResults/**/*.xml
+            **/TestResults/**/*.cobertura.xml
+            **/TestResults/**/*.trx
