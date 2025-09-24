@@ -1,7 +1,20 @@
-<h1>Logout</h1>
+<div class="min-h-screen flex flex-col items-center justify-center p-6">
+    <div class="max-w-md w-full border border-black/10 p-8 text-center bg-white">
+        <h1 class="text-lg font-light uppercase tracking-[.15em] text-black mb-4">Logout</h1>
+        <p class="text-xs uppercase tracking-[.15em] text-black/60 mb-8">Are you sure you want to log out?</p>
 
-<p>Are you sure you want to log out?</p>
-
-<form method="post" action="/api/auth/logout">
-    <button type="submit">Confir Logout</button>
-</form>
+        <div class="space-y-4">
+            <form method="post" action="/api/auth/logout" class="w-full">
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        class="block w-full py-[10px] px-6 text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 transition-colors">
+                    Confirm Logout
+                </button>
+            </form>
+            <a href="/"
+               class="block w-full py-[10px] px-6 text-xs font-light uppercase tracking-[.15em] text-black border border-black/20 hover:border-black transition-colors">
+                Cancel
+            </a>
+        </div>
+    </div>
+</div>

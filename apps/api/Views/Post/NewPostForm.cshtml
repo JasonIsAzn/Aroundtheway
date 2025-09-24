@@ -2,91 +2,191 @@
 @model PostFormViewModel
 
 @{
-    ViewData["Title"] = "Add a post";
+    ViewData["Title"] = "Add Post";
 }
 
-<h1 class="display-4">Add Post</h1>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-lg font-light uppercase tracking-[.15em] text-black">Add New Post</h1>
+        <a href="/posts" 
+           class="inline-flex items-center px-6 py-[10px] text-xs font-light uppercase tracking-[.15em] text-black hover:text-black/70 transition-colors">
+            Cancel
+        </a>
+    </div>
 
-<div class="card shadow">
-    <form asp-action="CreatePost" asp-controller="Post" method="post" enctype="multipart/form-data">
+    <form asp-action="CreatePost" asp-controller="Post" method="post" enctype="multipart/form-data" class="space-y-8">
         @Html.AntiForgeryToken()
-        <div class="card-body">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="rounded-none bg-red-50 p-4 mb-6">
+                <div asp-validation-summary="ModelOnly" class="text-xs uppercase tracking-[.15em] text-red-800"></div>
+            </div>
+        }
 
-            <div class="mb-3">
-                <label asp-for="ProductName" class="form-label">Product Name*:</label>
-                <input asp-for="ProductName" class="form-control" />
-                <span asp-validation-for="ProductName" class="form-text text-danger"></span>
+        <div class="space-y-6">
+            <h2 class="text-xs font-light uppercase tracking-[.15em] text-black/60">Product Information</h2>
+            
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label asp-for="ProductName" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                        Product Name *
+                    </label>
+                    <input asp-for="ProductName" 
+                           class="mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" 
+                           placeholder="Enter product name" />
+                    <span asp-validation-for="ProductName" class="text-red-600 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="Color" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                        Color *
+                    </label>
+                    <input asp-for="Color" 
+                           class="mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" 
+                           placeholder="Enter color" />
+                    <span asp-validation-for="Color" class="text-red-600 text-xs mt-1 block"></span>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Color" class="form-label">Color*:</label>
-                <input asp-for="Color" class="form-control" />
-                <span asp-validation-for="Color" class="form-text text-danger"></span>
+            <div>
+                <label asp-for="Price" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                    Price *
+                </label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-black/40 sm:text-sm">$</span>
+                    </div>
+                    <input asp-for="Price" 
+                           type="text"
+                           class="pl-7 mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" 
+                           placeholder="0.00" />
+                </div>
+                <span asp-validation-for="Price" class="text-red-600 text-xs mt-1 block"></span>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="Price" class="form-label">Price*:</label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="form-text text-danger"></span>
+        <div class="space-y-6">
+            <h2 class="text-xs font-light uppercase tracking-[.15em] text-black/60">Inventory</h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                <div>
+                    <label asp-for="NumOfSmall" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                        Small
+                    </label>
+                    <input asp-for="NumOfSmall" 
+                           type="number"
+                           class="mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" 
+                           placeholder="0" />
+                    <span asp-validation-for="NumOfSmall" class="text-red-600 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="NumOfMedium" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                        Medium
+                    </label>
+                    <input asp-for="NumOfMedium" 
+                           type="number"
+                           class="mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" 
+                           placeholder="0" />
+                    <span asp-validation-for="NumOfMedium" class="text-red-600 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="NumOfLarge" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                        Large
+                    </label>
+                    <input asp-for="NumOfLarge" 
+                           type="number"
+                           class="mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" 
+                           placeholder="0" />
+                    <span asp-validation-for="NumOfLarge" class="text-red-600 text-xs mt-1 block"></span>
+                </div>
+
+                <div>
+                    <label asp-for="NumOfXLarge" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
+                        X-Large
+                    </label>
+                    <input asp-for="NumOfXLarge" 
+                           type="number"
+                           class="mt-1 appearance-none relative block w-full px-3 py-[10px] border border-black/20 text-black text-sm focus:outline-none focus:border-black transition-colors" 
+                           placeholder="0" />
+                    <span asp-validation-for="NumOfXLarge" class="text-red-600 text-xs mt-1 block"></span>
+                </div>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="NumOfSmall" class="form-label">Number of Small Inventory:</label>
-                <input asp-for="NumOfSmall" class="form-control" />
-                <span asp-validation-for="NumOfSmall" class="form-text text-danger"></span>
+        <div class="space-y-6">
+            <h2 class="text-xs font-light uppercase tracking-[.15em] text-black/60">Images</h2>
+            
+            <div class="border border-black/10 p-6">
+                <p class="text-xs font-light uppercase tracking-[.15em] text-black/60 mb-4">Upload up to 10 images</p>
+
+                <input type="file" 
+                       id="multipleFiles" 
+                       name="Images" 
+                       accept="image/*" 
+                       multiple
+                       class="w-full text-xs text-black/60 file:mr-4 file:py-[10px] file:px-6 file:border file:border-black file:text-xs file:font-light file:uppercase file:tracking-[.15em] file:text-black hover:file:bg-black hover:file:text-white file:transition-colors" />
+
+                <div id="multipleFileInfo" class="hidden mt-4 p-4 bg-black/[0.02] text-xs uppercase tracking-[.15em] text-black/60"></div>
+                <span asp-validation-for="Images" class="text-red-600 text-xs mt-1 block"></span>
+
+                <div id="imagePreview" class="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <!-- Preview images will be inserted here by JavaScript -->
+                </div>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label asp-for="NumOfMedium" class="form-label">Number of Medium Inventory:</label>
-                <input asp-for="NumOfMedium" class="form-control" />
-                <span asp-validation-for="NumOfMedium" class="form-text text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="NumOfLarge" class="form-label">Number of Large Inventory:</label>
-                <input asp-for="NumOfLarge" class="form-control" />
-                <span asp-validation-for="NumOfLarge" class="form-text text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="NumOfXLarge" class="form-label">Number of X-Large Inventory:</label>
-                <input asp-for="NumOfXLarge" class="form-control" />
-                <span asp-validation-for="NumOfXLarge" class="form-text text-danger"></span>
-            </div>
-
-            <!-- Images -->
-            <div class="bg-white rounded-lg border border-gray-200 p-6 mb-4">
-                <h3 class="text-xl font-medium uppercase tracking-wide text-black mb-3">Images (up to 10)</h3>
-
-                <input type="file" id="multipleFiles" name="Images" accept="image/*" multiple
-                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800" />
-
-                <div id="multipleFileInfo" class="hidden mt-3 p-3 bg-gray-50 rounded-md text-sm text-gray-700"></div>
-                <span asp-validation-for="Images" class="form-text text-danger"></span>
-            </div>
-
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary">Add Post</button>
-            </div>
+        <div class="pt-8 border-t border-black/10">
+            <button type="submit" 
+                    class="w-full sm:w-auto py-[10px] px-6 text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 focus:outline-none transition-colors">
+                Create Post
+            </button>
         </div>
     </form>
 </div>
 
 <script>
-    // Preview only (no separate upload)
     const filesInput = document.getElementById('multipleFiles');
     const infoBox = document.getElementById('multipleFileInfo');
+    const previewBox = document.getElementById('imagePreview');
 
     filesInput.addEventListener('change', function (e) {
         const files = Array.from(e.target.files);
-        if (!files.length) { infoBox.classList.add('hidden'); infoBox.innerHTML = ''; return; }
+        if (!files.length) { 
+            infoBox.classList.add('hidden'); 
+            previewBox.innerHTML = '';
+            return; 
+        }
 
-        if (files.length > 10) alert('Please select no more than 10 images.');
+        if (files.length > 10) {
+            alert('Please select no more than 10 images.');
+            return;
+        }
+
         const totalMB = files.reduce((s, f) => s + f.size / 1024 / 1024, 0);
-        const list = files.map((f, i) => `${i + 1}. ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`).join('<br>');
-
-        infoBox.innerHTML = `<strong>Selected ${files.length} file(s), total ${totalMB.toFixed(2)} MB:</strong><br>${list}`;
+        infoBox.innerHTML = `Selected ${files.length} image${files.length > 1 ? 's' : ''} • ${totalMB.toFixed(1)}MB total`;
         infoBox.classList.remove('hidden');
+
+        // Clear and rebuild preview
+        previewBox.innerHTML = '';
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'aspect-square bg-black/[0.02] relative';
+                div.innerHTML = `
+                    <img src="${e.target.result}" 
+                         class="w-full h-full object-cover" 
+                         alt="Preview" />
+                    <span class="absolute bottom-2 right-2 text-[10px] bg-black/70 text-white px-2 py-0.5 uppercase tracking-wider">
+                        ${(file.size / 1024 / 1024).toFixed(1)}MB
+                    </span>
+                `;
+                previewBox.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
     });
 </script>
