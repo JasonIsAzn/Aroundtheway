@@ -21,11 +21,14 @@ public class HomeController : Controller
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
 
-        if (userId != null)
+        if (userId == null)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
-            ViewBag.CurrentUser = user;
+            return RedirectToAction("Login", "Account");
         }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
+        ViewBag.CurrentUser = user;
+
         ViewData["Title"] = "Home Page";
         return View();
     }
