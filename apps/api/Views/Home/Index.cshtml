@@ -38,16 +38,6 @@
                     <span class="text-black ml-2">@currentUser.UpdatedAt.ToString("MMM d, yyyy")</span>
                 </div>
             </div>
-
-            <div class="mt-6 pt-6 border-t border-black/10">
-                <form method="post" action="/api/auth/logout" class="inline-block">
-                    @Html.AntiForgeryToken()
-                    <button type="submit"
-                        class="py-[10px] px-6 text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 transition-colors">
-                        Logout
-                    </button>
-                </form>
-            </div>
         </div>
     }
 
