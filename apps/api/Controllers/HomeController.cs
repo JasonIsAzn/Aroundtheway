@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Aroundtheway.Api.Controllers;
 
+[Authorize(Policy = "AdminOnly")]
 public class HomeController : Controller
 {
     private readonly AppDbContext _context;

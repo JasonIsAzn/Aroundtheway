@@ -43,7 +43,7 @@
                 <form method="post" action="/api/auth/logout" class="inline-block">
                     @Html.AntiForgeryToken()
                     <button type="submit"
-                            class="py-[10px] px-6 text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 transition-colors">
+                        class="py-[10px] px-6 text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 transition-colors">
                         Logout
                     </button>
                 </form>
@@ -53,37 +53,36 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
         <a href="/api/status/db"
-           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
             <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">DB Connection</p>
             <p class="text-[10px] uppercase tracking-[.15em] text-black/60">Test database ping</p>
         </a>
 
         <a href="/account/login"
-           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
             <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">Login</p>
             <p class="text-[10px] uppercase tracking-[.15em] text-black/60">Authentication form</p>
         </a>
 
         <a href="/user"
-           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
             <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">User Directory</p>
             <p class="text-[10px] uppercase tracking-[.15em] text-black/60">View all users</p>
         </a>
 
         <a href="/admin"
-           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
             <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">Admin Panel</p>
             <p class="text-[10px] uppercase tracking-[.15em] text-black/60">User management</p>
         </a>
 
         <a href="/posts"
-           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
             <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">Posts</p>
             <p class="text-[10px] uppercase tracking-[.15em] text-black/60">Content management</p>
         </a>
 
-        <a href="/posts/new"
-           class="block bg-black hover:bg-gray-900 p-6 text-center transition-colors">
+        <a href="/posts/new" class="block bg-black hover:bg-gray-900 p-6 text-center transition-colors">
             <p class="text-xs font-light uppercase tracking-[.15em] text-white mb-2">New Post</p>
             <p class="text-[10px] uppercase tracking-[.15em] text-white/60">Create content</p>
         </a>

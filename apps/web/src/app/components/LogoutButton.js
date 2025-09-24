@@ -9,7 +9,12 @@ export default function LogoutButton() {
   async function handleClick() {
     try {
       await logout();
-      router.refresh();
+
+      localStorage.removeItem("user");
+
+      window.dispatchEvent(new Event("auth-changed"));
+
+      router.push("/");
     } catch (err) {
       console.error(err);
     }
