@@ -2,16 +2,16 @@ name: .NET CI
 
 on:
   pull_request:
-    branches: ["**"] # run on all PRs
+    branches: ["**"]
   push:
-    branches: [main] # (optional) also run on main
+    branches: ["main"]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-
     env:
-      # Safety: your app tries to read these; factory overrides them, but set anyway
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_NOLOGO: 1
       OPENAI_API_KEY: "test"
       AWS__AccessKey: "test"
       AWS__SecretKey: "test"
@@ -36,22 +36,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore
-        run: dotnet restore
+      - name: Restore API
+        run: dotnet restore apps/api/Aroundtheway.Api.csproj
 
-      - name: Build (Release)
-        run: dotnet build --no-restore -c Release
+      - name: Restore Tests
+        run: dotnet restore apps/api/Aroundtheway.Api.Tests/Aroundtheway.Api.Tests.csproj
 
-      - name: Test (with coverage)
-        run: dotnet test --no-build -c Release -v n --collect:"XPlat Code Coverage"
+      - name: Build API (Release)
+        run: dotnet build apps/api/Aroundtheway.Api.csproj -c Release --no-restore
 
-      # (optional) Upload coverage result
-      - name: Publish coverage artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage
-          path: |
-            **/TestResults/**/*.xml
-            **/TestResults/**/*.cobertura.xml
-            **/TestResults/**/*.trx
+      - name: Build Tests (Release)
+        run: dotnet build apps/api/Aroundtheway.Api.Tests/Aroundtheway.Api.Tests.csproj -c Release --no-restore
+
+      # Run tests
+      - name: Test
+        run: dotnet test apps/api/Aroundtheway.Api.Tests/Aroundtheway.Api.Tests.csproj -c Release --no-build -v n
