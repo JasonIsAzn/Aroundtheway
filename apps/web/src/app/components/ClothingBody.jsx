@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/http.client";
 
 function ProductCard({ front, back, description, price, productId = 1 }) {
   const [showBack, setShowBack] = useState(false);
@@ -10,6 +11,20 @@ function ProductCard({ front, back, description, price, productId = 1 }) {
   const handleCardClick = () => {
     window.location.href = `/product/${productId}`;
   };
+  async function getProducts() {
+    const res = await apiFetch("/api/products", {
+      method: "GET",
+    });
+    return res.json();
+  }
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await getProducts();
+      console.log(data);
+    }
+    loadData();
+  },[])
 
   return (
     <section className="cursor-pointer group" onClick={handleCardClick}>
@@ -44,6 +59,8 @@ function ProductCard({ front, back, description, price, productId = 1 }) {
 
 function ClothingBody() {
   return (
+    
+
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 py-8 max-w-7xl mx-auto">
       <ProductCard
         productId={1}

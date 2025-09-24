@@ -1,6 +1,9 @@
 "use client";
 import { useState } from 'react';
 import Header from '../../components/Header';
+import { useParams } from "next/navigation";
+import { useEffect } from 'react';
+import { apiFetch } from '@/lib/http.client';
 
 function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(0);
@@ -8,6 +11,7 @@ function ProductDetails() {
   const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
 
+  const [myProduct, setMyProduct] = useState();
   // Mock product data - would come from API/props in real implementation
   const product = {
     id: 1,
@@ -49,6 +53,27 @@ function ProductDetails() {
     });
     alert('Added to cart!');
   };
+
+  const params = useParams();
+
+async function getProduct(id) {
+  const res = await apiFetch(`/api/products/${id}`); // no body on GET
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+useEffect(() => {
+  if (!params.id) return;
+  (async () => {
+    try {
+      const data = await getProduct(params.id);
+      setMyProduct(data);
+    } catch (err) {
+      console.error(err);
+    }
+  })();
+}, [params.id]);
+
 
   return (
     <>
