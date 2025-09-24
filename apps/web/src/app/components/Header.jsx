@@ -86,7 +86,7 @@ function Header() {
               <a href="/login">Login</a>
             </li>
             <li>
-              <a href="/login">Register</a>
+              <a href="/register">Register</a>
             </li>
             <li>
               <a href="/checkout">BAG</a>

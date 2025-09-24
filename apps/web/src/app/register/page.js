@@ -3,6 +3,8 @@
 import { register } from "@/lib/auth.client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { googleLogin } from "@/lib/auth.client";
 
 function RegistrationForm() {
   const router = useRouter();
@@ -164,6 +166,25 @@ function RegistrationForm() {
     }
   };
 
+  const onGoogleSuccess = async (credentialResponse) => {
+    try {
+      const idToken = credentialResponse.credential;
+      if (!idToken) throw new Error("Missing Google credential");
+
+      const user = await googleLogin(idToken);
+      console.log("Logged in via Google:", user);
+
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      alert(`Google login failed: ${err.message || "Unknown error"}`);
+    }
+  };
+
+  const onGoogleError = () => {
+    alert("Google login failed");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -319,6 +340,7 @@ function RegistrationForm() {
             </div>
           </form>
         </div>
+        <GoogleLogin onSuccess={onGoogleSuccess} onError={onGoogleError} />
       </div>
     </div>
   );
