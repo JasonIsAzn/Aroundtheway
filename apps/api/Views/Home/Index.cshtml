@@ -2,49 +2,90 @@
     var currentUser = ViewBag.CurrentUser as Aroundtheway.Api.Models.User;
 }
 
-<div class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
-    <h1 class="text-3xl font-bold mb-8 text-gray-800">🛠️ Dev Debug Area</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-12">
+        <h1 class="text-lg font-light uppercase tracking-[.15em] text-black mb-2">Aroundtheway</h1>
+        <p class="text-xs uppercase tracking-[.15em] text-black/60">Admin Development Area</p>
+    </div>
 
     @if (currentUser != null)
     {
-        <div class="mb-6 p-4 bg-green-100 border border-green-300 rounded-lg shadow w-full max-w-md">
-            <h2 class="text-xl font-semibold text-green-800 mb-2">✅ Logged In User</h2>
-            <ul class="text-sm text-green-700 space-y-1">
-                <li><strong>ID:</strong> @currentUser.Id</li>
-                <li><strong>Email:</strong> @currentUser.Email</li>
-                <li><strong>GoogleSub:</strong> @currentUser.GoogleSub</li>
-                <li><strong>CreatedAt:</strong> @currentUser.CreatedAt</li>
-                <li><strong>UpdatedAt:</strong> @currentUser.UpdatedAt</li>
-                <li><strong>IsAdmin:</strong> @currentUser.IsAdmin</li>
-                <li><strong>Address:</strong> @currentUser.Address</li>
-                <li><strong>CreditCard:</strong> @currentUser.CreditCard</li>
-            </ul>
+        <div class="mb-12 p-6 bg-white border border-black/10 max-w-2xl mx-auto">
+            <h2 class="text-xs font-light uppercase tracking-[.15em] text-black mb-6">Current Session</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                    <span class="text-black/60 uppercase tracking-[.15em]">ID:</span>
+                    <span class="text-black ml-2">@currentUser.Id</span>
+                </div>
+                <div>
+                    <span class="text-black/60 uppercase tracking-[.15em]">Email:</span>
+                    <span class="text-black ml-2">@currentUser.Email</span>
+                </div>
+                <div>
+                    <span class="text-black/60 uppercase tracking-[.15em]">Google Sub:</span>
+                    <span class="text-black ml-2 font-mono">@currentUser.GoogleSub</span>
+                </div>
+                <div>
+                    <span class="text-black/60 uppercase tracking-[.15em]">Role:</span>
+                    <span class="text-black ml-2">@(currentUser.IsAdmin ? "Admin" : "User")</span>
+                </div>
+                <div>
+                    <span class="text-black/60 uppercase tracking-[.15em]">Created:</span>
+                    <span class="text-black ml-2">@currentUser.CreatedAt.ToString("MMM d, yyyy")</span>
+                </div>
+                <div>
+                    <span class="text-black/60 uppercase tracking-[.15em]">Updated:</span>
+                    <span class="text-black ml-2">@currentUser.UpdatedAt.ToString("MMM d, yyyy")</span>
+                </div>
+            </div>
 
-            <form method="post" action="/api/auth/logout" class="mt-4">
-                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded">
-                    Logout
-                </button>
-            </form>
+            <div class="mt-6 pt-6 border-t border-black/10">
+                <form method="post" action="/api/auth/logout" class="inline-block">
+                    @Html.AntiForgeryToken()
+                    <button type="submit"
+                            class="py-[10px] px-6 text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 transition-colors">
+                        Logout
+                    </button>
+                </form>
+            </div>
         </div>
     }
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-md">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
         <a href="/api/status/db"
-            class="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-blue-500 transition">
-            <p class="text-lg font-semibold text-gray-700">DB Ping</p>
-            <p class="text-sm text-gray-500">Test database connection</p>
+           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">DB Connection</p>
+            <p class="text-[10px] uppercase tracking-[.15em] text-black/60">Test database ping</p>
         </a>
 
         <a href="/account/login"
-            class="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-green-500 transition">
-            <p class="text-lg font-semibold text-gray-700">Login Page</p>
-            <p class="text-sm text-gray-500">Go to login form</p>
+           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">Login</p>
+            <p class="text-[10px] uppercase tracking-[.15em] text-black/60">Authentication form</p>
         </a>
 
         <a href="/user"
-            class="block bg-white shadow hover:shadow-lg rounded-lg p-4 text-center border border-gray-200 hover:border-red-500 transition">
-            <p class="text-lg font-semibold text-gray-700">View Users</p>
-            <p class="text-sm text-gray-500">GET /user</p>
+           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">User Directory</p>
+            <p class="text-[10px] uppercase tracking-[.15em] text-black/60">View all users</p>
+        </a>
+
+        <a href="/admin"
+           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">Admin Panel</p>
+            <p class="text-[10px] uppercase tracking-[.15em] text-black/60">User management</p>
+        </a>
+
+        <a href="/posts"
+           class="block bg-white border border-black/10 hover:border-black/20 p-6 text-center transition-colors">
+            <p class="text-xs font-light uppercase tracking-[.15em] text-black mb-2">Posts</p>
+            <p class="text-[10px] uppercase tracking-[.15em] text-black/60">Content management</p>
+        </a>
+
+        <a href="/posts/new"
+           class="block bg-black hover:bg-gray-900 p-6 text-center transition-colors">
+            <p class="text-xs font-light uppercase tracking-[.15em] text-white mb-2">New Post</p>
+            <p class="text-[10px] uppercase tracking-[.15em] text-white/60">Create content</p>
         </a>
     </div>
 </div>
