@@ -9,7 +9,7 @@ export default function LogoutButton() {
   async function handleClick() {
     try {
       await logout();
-      router.refresh();
+      router.push("/");
     } catch (err) {
       console.error(err);
     }

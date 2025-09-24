@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getMe, updateMyAddress } from "@/lib/users.client"; // adjust path
+import LogoutButton from "../components/LogoutButton";
 
 export default function UserProfile() {
   const [email, setEmail] = useState("");
@@ -286,6 +287,8 @@ export default function UserProfile() {
             </div>
           </form>
         </div>
+
+        <LogoutButton />
       </div>
     </main>
   );
