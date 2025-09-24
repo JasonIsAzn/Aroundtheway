@@ -3,6 +3,8 @@
 import { login } from "@/lib/auth.client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { googleLogin } from "@/lib/auth.client";
 
 function Login() {
   const router = useRouter();
@@ -75,6 +77,25 @@ function Login() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const onGoogleSuccess = async (credentialResponse) => {
+    try {
+      const idToken = credentialResponse.credential;
+      if (!idToken) throw new Error("Missing Google credential");
+
+      const user = await googleLogin(idToken);
+      console.log("Logged in via Google:", user);
+
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      alert(`Google login failed: ${err.message || "Unknown error"}`);
+    }
+  };
+
+  const onGoogleError = () => {
+    alert("Google login failed");
   };
 
   return (
@@ -173,6 +194,8 @@ function Login() {
             </div>
           </form>
         </div>
+
+        <GoogleLogin onSuccess={onGoogleSuccess} onError={onGoogleError} />
       </div>
     </main>
   );
