@@ -1,19 +1,66 @@
 "use client";
+import { useEffect, useState } from "react";
 import styles from "./Header.module.css";
-import { useState } from "react";
 
 function Header() {
   const [logoSrc, setLogoSrc] = useState("/aroundthewayLogoA.png");
+  const [me, setMe] = useState(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const loadUserFromStorage = () => {
+    try {
+      const raw = localStorage.getItem("user");
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    // initial load
+    const user = loadUserFromStorage();
+    setMe(user);
+    setIsLoggedIn(!!user);
+    setIsLoadingUser(false);
+
+    // sync across tabs
+    const onStorage = (e) => {
+      if (e.key === "user") {
+        const next = loadUserFromStorage();
+        setMe(next);
+        setIsLoggedIn(!!next);
+      }
+    };
+    window.addEventListener("storage", onStorage);
+
+    const onAuthChanged = () => {
+      const next = loadUserFromStorage();
+      setMe(next);
+      setIsLoggedIn(!!next);
+    };
+    window.addEventListener("auth-changed", onAuthChanged);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("auth-changed", onAuthChanged);
+    };
+  }, []);
+
+  const loggedIn = !isLoadingUser && isLoggedIn;
 
   return (
     <div className={styles.container}>
-      <img
-        className={styles.image}
-        src={logoSrc}
-        alt="Aroundtheway Logo"
-        onMouseEnter={() => setLogoSrc("/aroundthewayLogo.png")}
-        onMouseLeave={() => setLogoSrc("/aroundthewayLogoA.png")}
-      />
+      <a href="/">
+        <img
+          className={styles.image}
+          src={logoSrc}
+          alt="Aroundtheway Logo"
+          onMouseEnter={() => setLogoSrc("/aroundthewayLogo.png")}
+          onMouseLeave={() => setLogoSrc("/aroundthewayLogoA.png")}
+        />
+      </a>
 
       <nav className={styles.navBarContainer}>
         <ul className={styles.navBar}>
@@ -28,42 +75,40 @@ function Header() {
               </li>
             </ul>
           </li>
-
-          <li className={styles.hasDropdown}>
-            <a href="#">COMMUNITY</a>
-            <ul className={styles.dropdown} aria-label="Market submenu">
-              <li>
-                <a href="#">EVENTS</a>
-              </li>
-              <li>
-                <a href="#">BARBERSHOP</a>
-              </li>
-            </ul>
-          </li>
-
-          <li className={styles.hasDropdown}>
-            <a href="#">CONTACT</a>
-            <ul className={styles.dropdown} aria-label="Market submenu">
-              <li>
-                <a href="#">INQUIRE</a>
-              </li>
-            </ul>
+          <li>
+            <a href="/chat">CHAT</a>
           </li>
         </ul>
       </nav>
 
-      <section className={styles.navFooterContainer}>
-        <ul className={styles.navFooter}>
-          <li>
-            <a href="#">ACCOUNT</a>
-          </li>
-          <li>
-            <a href="#">BAG</a>
-          </li>
-          {/* <a className={styles.numItemsInBag}><span>4</span></a> */}
-        </ul>
-      </section>
+      {loggedIn ? (
+        <section className={styles.navFooterContainer}>
+          <ul className={styles.navFooter}>
+            <li>
+              <a href="/profile">ACCOUNT</a>
+            </li>
+            <li>
+              <a href="/checkout">BAG</a>
+            </li>
+          </ul>
+        </section>
+      ) : (
+        <section className={styles.navFooterContainer}>
+          <ul className={styles.navFooter}>
+            <li>
+              <a href="/login">Login</a>
+            </li>
+            <li>
+              <a href="/register">Register</a>
+            </li>
+            <li>
+              <a href="/checkout">BAG</a>
+            </li>
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
+
 export default Header;

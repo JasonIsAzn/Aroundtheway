@@ -43,10 +43,20 @@ const SAMPLE_PRODUCTS = [
   },
 ];
 
+const getStoredUser = () => {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
 export default function CheckoutPage() {
   // cart
   const [cart, setCartState] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // address form
   const [formState, setFormState] = useState({
@@ -74,26 +84,64 @@ export default function CheckoutPage() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  // load existing address
   useEffect(() => {
+    const u = getStoredUser();
+    setIsLoggedIn(!!u);
+
+    const onAuthChanged = () => setIsLoggedIn(!!getStoredUser());
+    const onStorage = (e) => {
+      if (e.key === "user") onAuthChanged();
+    };
+
+    window.addEventListener("auth-changed", onAuthChanged);
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("auth-changed", onAuthChanged);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  useEffect(() => {
+    let canceled = false;
+
     const loadProfile = async () => {
+      setIsAddrLoading(true);
       try {
-        const data = await getMe(); // GET /api/users/me
+        if (!isLoggedIn) {
+          if (!canceled) {
+            setFormState({
+              address: "",
+              city: "",
+              state: "",
+              zipCode: "",
+              country: "",
+            });
+            setIsAddrLoading(false);
+          }
+          return;
+        }
+        const data = await getMe();
+        if (canceled) return;
         setFormState({
-          address: data.address?.address || "",
-          city: data.address?.city || "",
-          state: data.address?.state || "",
-          zipCode: data.address?.zipCode || "",
-          country: data.address?.country || "",
+          address: data?.address?.address || "",
+          city: data?.address?.city || "",
+          state: data?.address?.state || "",
+          zipCode: data?.address?.zipCode || "",
+          country: data?.address?.country || "",
         });
       } catch (e) {
         console.error("Failed to load address", e);
       } finally {
-        setIsAddrLoading(false);
+        if (!canceled) setIsAddrLoading(false);
       }
     };
+
     loadProfile();
-  }, []);
+    return () => {
+      canceled = true;
+    };
+  }, [isLoggedIn]);
 
   const subtotalCents = useMemo(
     () => cart.reduce((sum, i) => sum + i.unitAmountCents * i.quantity, 0),
@@ -154,8 +202,13 @@ export default function CheckoutPage() {
         zipCode: formState.zipCode || null,
         country: formState.country || null,
       };
-      await updateMyAddress(payload); // PUT /api/users/me/address
-      alert("Address saved!");
+
+      if (isLoggedIn) {
+        await updateMyAddress(payload);
+        alert("Address saved to your profile!");
+      } else {
+        alert("Address saved for this checkout (guest).");
+      }
     } catch (e) {
       console.error("Address update error:", e);
       alert("Could not save address. Please try again.");
@@ -203,7 +256,9 @@ export default function CheckoutPage() {
 
   return (
     <main className="mx-auto max-w-3xl p-6 space-y-8">
-      <h1 className="text-2xl font-semibold">Checkout (Local Cart)</h1>
+      <h1 className="text-2xl font-semibold">
+        {isLoggedIn ? "Checkout" : "Guest Checkout"}
+      </h1>
 
       {/* Sample products */}
       <section className="space-y-3">
