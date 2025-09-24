@@ -1,15 +1,76 @@
-﻿<!DOCTYPE html>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var isLoggedIn = HttpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+    var isAdmin = HttpContextAccessor.HttpContext?.User?.IsInRole("Admin") ?? false;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Aroundtheway.Api</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Aroundtheway</title>
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/navbar.css" asp-append-version="true" />
 </head>
 
 <body>
+    <nav class="nav-container">
+        <a href="/">
+            <img class="nav-logo" src="~/aroundthewayLogoA.png" alt="Aroundtheway Logo" />
+        </a>
+
+        <div class="nav-bar-container">
+            <ul class="nav-bar">
+                <li class="has-dropdown">
+                    <a href="#">SHOP</a>
+                    <ul class="dropdown">
+                        <li><a href="/clothing">CLOTHING</a></li>
+                        <li><a href="/accessories">ACCESSORIES</a></li>
+                    </ul>
+                </li>
+                <li class="has-dropdown">
+                    <a href="#">COMMUNITY</a>
+                    <ul class="dropdown">
+                        <li><a href="/events">EVENTS</a></li>
+                        <li><a href="/barbershop">BARBERSHOP</a></li>
+                    </ul>
+                </li>
+                <li class="has-dropdown">
+                    <a href="#">CONTACT</a>
+                    <ul class="dropdown">
+                        <li><a href="/contact">INQUIRE</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <section class="nav-footer-container">
+            <ul class="nav-footer">
+                @if (isLoggedIn)
+                {
+                    @if (isAdmin)
+                    {
+                        <li><a href="/admin">ADMIN</a></li>
+                    }
+                    <li>
+                        <form method="post" action="/api/auth/logout" style="display:inline;">
+                            <button type="submit" style="background:none;border:none;cursor:pointer;color:black;letter-spacing:-1px;font-size:12px;">LOGOUT</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li><a href="/login">LOGIN</a></li>
+                }
+                <li><a href="/cart">BAG</a></li>
+            </ul>
+        </section>
+    </nav>
+
     <main>
         @RenderBody()
     </main>
