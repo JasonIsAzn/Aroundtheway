@@ -20,4 +20,9 @@
     <PackageReference Include="Supabase" Version="1.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Aroundtheway.Api.Tests/**" />
+    <EmbeddedResource Remove="Aroundtheway.Api.Tests/**" />
+    <None Remove="Aroundtheway.Api.Tests/**" />
+  </ItemGroup>
 </Project>
