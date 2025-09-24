@@ -1,36 +1,50 @@
 "use client";
-import { getMe } from "@/lib/auth.client";
-import styles from "./Header.module.css";
 import { useEffect, useState } from "react";
+import styles from "./Header.module.css";
 
 function Header() {
   const [logoSrc, setLogoSrc] = useState("/aroundthewayLogoA.png");
-
   const [me, setMe] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const loadUserFromStorage = () => {
+    try {
+      const raw = localStorage.getItem("user");
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  };
+
   useEffect(() => {
-    let isMounted = true;
+    // initial load
+    const user = loadUserFromStorage();
+    setMe(user);
+    setIsLoggedIn(!!user);
+    setIsLoadingUser(false);
 
-    (async () => {
-      try {
-        const data = await getMe();
-        if (!isMounted) return;
-
-        setMe(data);
-        setIsLoggedIn(!!data);
-      } catch (err) {
-        if (!isMounted) return;
-        setMe(null);
-        setIsLoggedIn(false);
-      } finally {
-        if (isMounted) setIsLoadingUser(false);
+    // sync across tabs
+    const onStorage = (e) => {
+      if (e.key === "user") {
+        const next = loadUserFromStorage();
+        setMe(next);
+        setIsLoggedIn(!!next);
       }
-    })();
+    };
+    window.addEventListener("storage", onStorage);
+
+    const onAuthChanged = () => {
+      const next = loadUserFromStorage();
+      setMe(next);
+      setIsLoggedIn(!!next);
+    };
+    window.addEventListener("auth-changed", onAuthChanged);
 
     return () => {
-      isMounted = false;
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("auth-changed", onAuthChanged);
     };
   }, []);
 
@@ -61,7 +75,6 @@ function Header() {
               </li>
             </ul>
           </li>
-
           <li>
             <a href="/chat">CHAT</a>
           </li>
@@ -97,4 +110,5 @@ function Header() {
     </div>
   );
 }
+
 export default Header;

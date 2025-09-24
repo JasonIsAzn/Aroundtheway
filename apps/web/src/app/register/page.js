@@ -154,12 +154,18 @@ function RegistrationForm() {
     setIsSubmitting(true);
 
     try {
-      await register(formState);
+      const user = await register(formState);
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      window.dispatchEvent(new Event("auth-changed"));
+
       router.push("/");
     } catch (err) {
       if (err.status === 409) {
-        console.log(err.message);
         setErrors({ email: "Email already in use" });
+      } else {
+        console.error("Registration failed:", err);
       }
     } finally {
       setIsSubmitting(false);
@@ -173,6 +179,8 @@ function RegistrationForm() {
 
       const user = await googleLogin(idToken);
       console.log("Logged in via Google:", user);
+
+      localStorage.setItem("user", JSON.stringify(user));
 
       window.location.href = "/";
     } catch (err) {

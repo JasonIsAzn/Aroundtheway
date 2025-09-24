@@ -58,14 +58,15 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
     try {
       const res = await login(formState);
-      console.log(res);
+      console.log("login response", res);
+
+      localStorage.setItem("user", JSON.stringify(res));
+
       router.push("/");
     } catch (err) {
       if (err.status === 401) {
@@ -86,6 +87,8 @@ function Login() {
 
       const user = await googleLogin(idToken);
       console.log("Logged in via Google:", user);
+
+      localStorage.setItem("user", JSON.stringify(user));
 
       window.location.href = "/";
     } catch (err) {
