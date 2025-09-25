@@ -22,10 +22,67 @@ export default function ChatPage() {
         const response = await fetch("/api/products");
         if (response.ok) {
           const data = await response.json();
+          console.log("Products fetched:", data);
           setProducts(data);
+        } else {
+          console.error("Failed to fetch products:", response.status);
+          // Use mock data if API fails
+          setProducts([
+            {
+              id: 1,
+              productName: "Classic Hoodie",
+              color: "Black",
+              price: 89.99,
+              inStock: true,
+              description: "Premium cotton hoodie"
+            },
+            {
+              id: 2,
+              productName: "Streetwear Tee",
+              color: "White",
+              price: 45.00,
+              inStock: true,
+              description: "Comfortable cotton t-shirt"
+            },
+            {
+              id: 3,
+              productName: "Urban Jacket",
+              color: "Navy",
+              price: 129.99,
+              inStock: false,
+              description: "Stylish urban jacket"
+            }
+          ]);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
+        // Use mock data if fetch fails
+        setProducts([
+          {
+            id: 1,
+            productName: "Classic Hoodie",
+            color: "Black",
+            price: 89.99,
+            inStock: true,
+            description: "Premium cotton hoodie"
+          },
+          {
+            id: 2,
+            productName: "Streetwear Tee",
+            color: "White",
+            price: 45.00,
+            inStock: true,
+            description: "Comfortable cotton t-shirt"
+          },
+          {
+            id: 3,
+            productName: "Urban Jacket",
+            color: "Navy",
+            price: 129.99,
+            inStock: false,
+            description: "Stylish urban jacket"
+          }
+        ]);
       }
     };
 
@@ -45,6 +102,8 @@ export default function ChatPage() {
 
     try {
       let botResponse = "";
+      console.log("Processing prompt:", prompt);
+      console.log("Available products:", products);
 
       // Generate responses based on backend data
       if (prompt.includes("products available")) {
@@ -194,9 +253,9 @@ export default function ChatPage() {
           </div>
 
           {/* Predefined Prompts Area */}
-          <div className="border-t border-gray-200 p-4">
-            <div className="mb-4">
-              <p className="text-sm font-medium text-gray-800 mb-3">Choose a question:</p>
+          <div className="border-t border-gray-200 p-6">
+            <div className="mb-6">
+              <p className="text-sm font-medium text-gray-900 mb-4">Choose a question:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
                   "What products are available?",
@@ -209,17 +268,17 @@ export default function ChatPage() {
                   <button
                     key={index}
                     onClick={() => handlePromptClick(prompt)}
-                    className="p-3 text-sm text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-3 text-sm text-left bg-white hover:bg-black hover:text-white border border-gray-300 hover:border-black rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-gray-900 disabled:hover:border-gray-300"
                     disabled={isLoading}
                   >
-                    <span className="font-medium text-black">{prompt}</span>
+                    <span className="font-medium">{prompt}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Additional Info */}
-            <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="pt-4 border-t border-gray-200">
               <p className="text-xs text-gray-500 text-center">
                 {products.length > 0
                   ? `Showing information from ${products.length} products in our catalog`
