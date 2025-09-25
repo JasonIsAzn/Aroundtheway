@@ -13,6 +13,7 @@ export default function ChatPage() {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [customMessage, setCustomMessage] = useState("");
 
   const handlePromptClick = async (prompt) => {
     const userMessage = {
@@ -68,6 +69,14 @@ export default function ChatPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCustomMessage = async (e) => {
+    e.preventDefault();
+    if (!customMessage.trim() || isLoading) return;
+
+    await handlePromptClick(customMessage.trim());
+    setCustomMessage("");
   };
 
   const formatTime = (timestamp) => {
@@ -166,6 +175,28 @@ export default function ChatPage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Custom Message Input */}
+            <div className="mt-6">
+              <form onSubmit={handleCustomMessage} className="flex gap-3">
+                <input
+                  type="text"
+                  value={customMessage}
+                  onChange={(e) => setCustomMessage(e.target.value)}
+                  placeholder="Type your own question..."
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isLoading}
+                  maxLength={500}
+                />
+                <button
+                  type="submit"
+                  disabled={!customMessage.trim() || isLoading}
+                  className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-black transition-colors duration-200"
+                >
+                  Send
+                </button>
+              </form>
             </div>
 
             {/* Additional Info */}
