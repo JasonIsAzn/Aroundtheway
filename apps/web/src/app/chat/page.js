@@ -43,7 +43,7 @@ export default function ChatPage() {
 
       if (response.ok) {
         const data = await response.json();
-        botResponse = data.response || "I'm here to help! How can I assist you today?";
+        botResponse = data.message || "I'm here to help! How can I assist you today?";
       } else {
         console.error("API Error:", response.status, response.statusText);
         botResponse = "I'm having trouble connecting to our systems right now. Please try again in a moment.";
