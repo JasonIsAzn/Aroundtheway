@@ -7,7 +7,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi! I'm your shopping assistant. Choose a question below to get started.",
+      text: "👋 Welcome to Aroundtheway! I'm your personal shopping assistant. I'm here to help you discover amazing products, find the perfect fit, and answer any questions about our collection. What would you like to know?",
       sender: "bot",
       timestamp: new Date().toISOString(),
     },
@@ -158,12 +158,15 @@ export default function ChatPage() {
               <p className="text-sm font-medium text-gray-900 mb-4">Choose a question:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
-                  "What products are available?",
-                  "Show me your price range",
-                  "What are your popular items?",
-                  "What colors are available?",
-                  "Check stock availability",
-                  "Help me find my size",
+                  "🛍️ What's new this season?",
+                  "💰 Show me sale items",
+                  "📏 What sizes do you have?",
+                  "🚚 Shipping & delivery info",
+                  "↩️ Return & exchange policy",
+                  "🎯 Help me find my style",
+                  "💳 Payment options",
+                  "⭐ Best selling items",
+                  "🎁 Gift cards available?",
                 ].map((prompt, index) => (
                   <button
                     key={index}
@@ -184,7 +187,7 @@ export default function ChatPage() {
                   type="text"
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
-                  placeholder="Type your own question..."
+                  placeholder="Ask me about products, sizes, shipping, returns..."
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isLoading}
                   maxLength={500}
@@ -199,9 +202,17 @@ export default function ChatPage() {
               </form>
             </div>
 
-            {/* Additional Info */}
+            {/* Pro Tips */}
             <div className="pt-4 border-t border-gray-200">
-              <p className="text-xs text-gray-500 text-center">
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h6 className="text-sm font-medium text-gray-900 mb-2">💡 Pro Tips:</h6>
+                <ul className="text-xs text-gray-600 space-y-1">
+                  <li>• Ask specific questions about fit, material, or care instructions</li>
+                  <li>• Mention your style preferences for personalized recommendations</li>
+                  <li>• Need help choosing between items? I can compare features for you</li>
+                </ul>
+              </div>
+              <p className="text-xs text-gray-500 text-center mt-3">
                 Powered by OpenAI ChatGPT for intelligent shopping assistance
               </p>
             </div>
