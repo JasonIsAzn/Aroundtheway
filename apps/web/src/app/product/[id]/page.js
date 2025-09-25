@@ -1,143 +1,154 @@
 "use client";
 import { useState } from "react";
-import Header from "../../components/Header";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { apiFetch } from "@/lib/http.client";
+import { addItem } from "@/lib/cart";
 
 function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
-  
   const [myProduct, setMyProduct] = useState(null);
 
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      alert("Please select a size");
-      return;
-    }
-    if (!selectedColor) {
-      alert("Please select a color");
-      return;
-    }
+  const params = useParams();
+  const router = useRouter();
 
-    console.log("Adding to cart:", {
-      productId: product.id,
-      size: selectedSize,
-      color: selectedColor,
-      quantity,
-    });
-    alert("Added to cart!");
+  async function getProduct(id) {
+    const res = await apiFetch(`/api/products/${id}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  useEffect(() => {
+    if (!params.id) return;
+    (async () => {
+      try {
+        const data = await getProduct(params.id);
+        console.log(data);
+        setMyProduct(data);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [params.id]);
+
+  console.log(myProduct);
+
+  if (myProduct === null) return null;
+
+  const cartItem = {
+    id: myProduct.id ?? params.id,
+    name: myProduct.productName ?? myProduct.name ?? "Product",
+    unitAmountCents:
+      myProduct.unitAmountCents ??
+      myProduct.priceCents ??
+      (typeof myProduct.price === "number"
+        ? Math.round(myProduct.price * 100)
+        : undefined),
+    currency: (myProduct.currency ?? "usd").toLowerCase(),
+    imageUrl: myProduct.imageUrls[0] ?? "",
   };
 
-  const params = useParams();
+  const handleBuyNow = () => {
+    addItem(cartItem, quantity);
+    alert(`Added ${quantity} × ${cartItem.name} to cart.`);
+    router.push("/checkout");
+  };
 
-async function getProduct(id) {
-  const res = await apiFetch(`/api/products/${id}`); // no body on GET
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
-useEffect(() => {
-  if (!params.id) return;
-  (async () => {
-    try {
-      const data = await getProduct(params.id);
-      console.log(data);
-      setMyProduct(data);
-    } catch (err) {
-      console.error(err);
-    }
-  })();
-}, [params.id]);
-
-console.log(myProduct);
-
-if (myProduct === null) return null;  
   return (
-  <>
-    {/* left product image*/}
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
-      <section className="space-y-4">
-        <div className="relative w-full bg-white aspect-square overflow-hidden rounded-xl">
-          <img
-            src={myProduct.imageUrls[0]}
-            alt={myProduct.productName}
-            className="w-full h-full object-contain"
-          />
-        </div>
-      </section>
-
-      {/* right product details */}
-      <section className="flex flex-col justify-center">
-        {/* name & price */}
-        <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-            {myProduct.productName}
-          </h1>
-          <p className="mt-2 text-base">${myProduct.price}</p>
-        </div>
-
-        {/* color */}
-        <div className="mb-6">
-          <p className="text-xs uppercase text-gray-500 mb-2">Color</p>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setSelectedColor(myProduct.color)}
-              className={`w-10 h-10 rounded-md border ${
-                selectedColor === myProduct.color ? "border-black" : "border-gray-300"
-              }`}
-              style={{ backgroundColor: myProduct.color }}
-              title={myProduct.color}>
-              <span className="sr-only">{myProduct.color}</span>
-            </button>
-            <span className="text-sm text-gray-700">
-              {selectedColor || "Select color"}
-            </span>
+    <>
+      {/* left product image*/}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <section className="space-y-4">
+          <div className="relative w-full bg-white aspect-square overflow-hidden rounded-xl">
+            <img
+              src={myProduct.imageUrls[0]}
+              alt={myProduct.productName}
+              className="w-full h-full object-contain"
+            />
           </div>
-        </div>
+        </section>
 
-        {/* sizes (static demo for now) */}
-        <div className="mb-6">
-          <p className="text-xs uppercase text-gray-500 mb-2">Size</p>
-          <div className="flex flex-wrap gap-2">
-            {["S", "M", "L", "XL", "XXL"].map((s) => (
+        {/* right product details */}
+        <section className="flex flex-col justify-center">
+          {/* name & price */}
+          <div className="mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+              {myProduct.productName}
+            </h1>
+            <p className="mt-2 text-base">${myProduct.price}</p>
+          </div>
+
+          {/* color */}
+          <div className="mb-6">
+            <p className="text-xs uppercase text-gray-500 mb-2">Color</p>
+            <div className="flex items-center gap-3">
               <button
-                key={s}
                 type="button"
-                onClick={() => setSelectedSize(s)}
-                className={`px-3 py-2 text-sm border rounded-md ${
-                  selectedSize === s ? "border-black" : "border-gray-300"
+                onClick={() => setSelectedColor(myProduct.color)}
+                className={`w-10 h-10 rounded-md border ${
+                  selectedColor === myProduct.color
+                    ? "border-black"
+                    : "border-gray-300"
                 }`}
+                style={{ backgroundColor: myProduct.color }}
+                title={myProduct.color}
               >
-                {s}
+                <span className="sr-only">{myProduct.color}</span>
               </button>
-            ))}
+              <span className="text-sm text-gray-700">
+                {selectedColor || "Select color"}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* add to bag */}
-        <div className="mt-8">
-          <button
-            onClick={handleAddToCart}
-            disabled={!selectedSize || !selectedColor}
-            className={`w-full h-14 text-white font-medium rounded-none ${
-              !selectedSize || !selectedColor
-                ? "bg-black/60 cursor-not-allowed"
-                : "bg-black hover:opacity-90"
-            }`}
-          >
-            ADD TO BAG
-          </button>
-        </div>
-      </section>
-    </div>
-  </>
-);
+          {/* sizes (static demo for now) */}
+          <div className="mb-6">
+            <p className="text-xs uppercase text-gray-500 mb-2">Size</p>
+            <div className="flex flex-wrap gap-2">
+              {["S", "M", "L", "XL", "XXL"].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSelectedSize(s)}
+                  className={`px-3 py-2 text-sm border rounded-md ${
+                    selectedSize === s ? "border-black" : "border-gray-300"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
+              −
+            </button>
+            <span>{quantity}</span>
+            <button onClick={() => setQuantity((q) => q + 1)}>+</button>
+          </div>
+
+          {/* add to bag */}
+          <div className="mt-8">
+            <button
+              onClick={handleBuyNow}
+              disabled={!selectedSize || !selectedColor}
+              className={`w-full h-14 text-white font-medium rounded-none ${
+                !selectedSize || !selectedColor
+                  ? "bg-black/60 cursor-not-allowed"
+                  : "bg-black hover:opacity-90"
+              }`}
+            >
+              ADD TO BAG
+            </button>
+          </div>
+        </section>
+      </div>
+    </>
+  );
 }
 
 export default ProductDetails;
-
