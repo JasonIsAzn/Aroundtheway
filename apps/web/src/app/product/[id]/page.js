@@ -58,9 +58,8 @@ console.log(myProduct);
 if (myProduct === null) return null;  
   return (
   <>
-
+    {/* left product image*/}
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
-      {/* LEFT: product image */}
       <section className="space-y-4">
         <div className="relative w-full bg-white aspect-square overflow-hidden rounded-xl">
           <img
@@ -71,11 +70,11 @@ if (myProduct === null) return null;
         </div>
       </section>
 
-      {/* RIGHT: product details */}
-      <section>
+      {/* right product details */}
+      <section className="flex flex-col justify-center">
         {/* name & price */}
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-medium tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             {myProduct.productName}
           </h1>
           <p className="mt-2 text-base">${myProduct.price}</p>
@@ -89,11 +88,10 @@ if (myProduct === null) return null;
               type="button"
               onClick={() => setSelectedColor(myProduct.color)}
               className={`w-10 h-10 rounded-md border ${
-                selectedColor ? "border-black" : "border-gray-300"
+                selectedColor === myProduct.color ? "border-black" : "border-gray-300"
               }`}
-              title={myProduct.color}
-            >
-              {/* simple swatch fallback */}
+              style={{ backgroundColor: myProduct.color }}
+              title={myProduct.color}>
               <span className="sr-only">{myProduct.color}</span>
             </button>
             <span className="text-sm text-gray-700">
