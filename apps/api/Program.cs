@@ -11,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
+// Add CORS services
+builder.Services.AddCors();
+
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -100,6 +103,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Configure CORS to allow requests from the frontend
+app.UseCors(policy => policy
+    .WithOrigins("http://localhost:3000")
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials());
 
 app.UseAuthentication();
 app.UseAuthorization();
