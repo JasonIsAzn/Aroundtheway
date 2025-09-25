@@ -13,81 +13,6 @@ export default function ChatPage() {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [products, setProducts] = useState([]);
-
-  // Fetch products data on component mount
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("/api/products");
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Products fetched:", data);
-          setProducts(data);
-        } else {
-          console.error("Failed to fetch products:", response.status);
-          // Use mock data if API fails
-          setProducts([
-            {
-              id: 1,
-              productName: "Classic Hoodie",
-              color: "Black",
-              price: 89.99,
-              inStock: true,
-              description: "Premium cotton hoodie"
-            },
-            {
-              id: 2,
-              productName: "Streetwear Tee",
-              color: "White",
-              price: 45.00,
-              inStock: true,
-              description: "Comfortable cotton t-shirt"
-            },
-            {
-              id: 3,
-              productName: "Urban Jacket",
-              color: "Navy",
-              price: 129.99,
-              inStock: false,
-              description: "Stylish urban jacket"
-            }
-          ]);
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        // Use mock data if fetch fails
-        setProducts([
-          {
-            id: 1,
-            productName: "Classic Hoodie",
-            color: "Black",
-            price: 89.99,
-            inStock: true,
-            description: "Premium cotton hoodie"
-          },
-          {
-            id: 2,
-            productName: "Streetwear Tee",
-            color: "White",
-            price: 45.00,
-            inStock: true,
-            description: "Comfortable cotton t-shirt"
-          },
-          {
-            id: 3,
-            productName: "Urban Jacket",
-            color: "Navy",
-            price: 129.99,
-            inStock: false,
-            description: "Stylish urban jacket"
-          }
-        ]);
-      }
-    };
-
-    fetchProducts();
-  }, []);
 
   const handlePromptClick = async (prompt) => {
     const userMessage = {
@@ -101,60 +26,26 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      let botResponse = "";
-      console.log("Processing prompt:", prompt);
-      console.log("Available products:", products);
+      // Add realistic processing delay
+      await new Promise(resolve => setTimeout(resolve, 1200));
 
-      // Generate responses based on backend data
-      if (prompt.includes("products available")) {
-        if (products.length > 0) {
-          const availableProducts = products.filter(p => p.inStock);
-          botResponse = `We currently have ${availableProducts.length} products available:\n\n${availableProducts
-            .slice(0, 5)
-            .map(p => `• ${p.productName} - ${p.color} ($${p.price})`)
-            .join('\n')}`;
-          if (availableProducts.length > 5) {
-            botResponse += `\n\n...and ${availableProducts.length - 5} more items!`;
-          }
-        } else {
-          botResponse = "I'm still loading our product catalog. Please try again in a moment.";
-        }
-      } else if (prompt.includes("price range")) {
-        if (products.length > 0) {
-          const prices = products.map(p => p.price);
-          const minPrice = Math.min(...prices);
-          const maxPrice = Math.max(...prices);
-          botResponse = `Our products range from $${minPrice.toFixed(2)} to $${maxPrice.toFixed(2)}. What's your budget?`;
-        } else {
-          botResponse = "I'm still loading pricing information. Please try again in a moment.";
-        }
-      } else if (prompt.includes("popular items")) {
-        if (products.length > 0) {
-          const popularItems = products.slice(0, 3);
-          botResponse = `Here are some of our popular items:\n\n${popularItems
-            .map(p => `• ${p.productName} in ${p.color} - $${p.price} ${p.inStock ? '✅ In Stock' : '❌ Out of Stock'}`)
-            .join('\n')}`;
-        } else {
-          botResponse = "I'm still loading our popular items. Please try again in a moment.";
-        }
-      } else if (prompt.includes("colors available")) {
-        if (products.length > 0) {
-          const colors = [...new Set(products.map(p => p.color))];
-          botResponse = `We have products available in these colors:\n${colors.join(', ')}`;
-        } else {
-          botResponse = "I'm still loading color options. Please try again in a moment.";
-        }
-      } else if (prompt.includes("stock")) {
-        if (products.length > 0) {
-          const inStock = products.filter(p => p.inStock).length;
-          const total = products.length;
-          botResponse = `Currently ${inStock} out of ${total} products are in stock. Would you like to see what's available?`;
-        } else {
-          botResponse = "I'm checking our inventory. Please try again in a moment.";
-        }
+      // Call the backend ChatBot API
+      const response = await fetch("/api/chatbot/message", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: prompt }),
+      });
+
+      let botResponse = "";
+
+      if (response.ok) {
+        const data = await response.json();
+        botResponse = data.response || "I'm here to help! How can I assist you today?";
       } else {
-        // Fallback for other prompts
-        botResponse = "Thanks for your question! I can help you with product information, pricing, stock availability, and more. Try one of the other prompts below.";
+        console.error("API Error:", response.status, response.statusText);
+        botResponse = "I'm having trouble connecting to our systems right now. Please try again in a moment.";
       }
 
       const botMessage = {
@@ -280,10 +171,7 @@ export default function ChatPage() {
             {/* Additional Info */}
             <div className="pt-4 border-t border-gray-200">
               <p className="text-xs text-gray-500 text-center">
-                {products.length > 0
-                  ? `Showing information from ${products.length} products in our catalog`
-                  : "Loading product catalog..."
-                }
+                Powered by OpenAI ChatGPT for intelligent shopping assistance
               </p>
             </div>
           </div>
