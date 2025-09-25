@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getCheckoutSession } from "@/lib/checkout.client";
+import { createTransaction } from "@/lib/transaction.client";
+import { clearCart } from "@/lib/cart";
 
 export default function SuccessPage() {
   const sp = useSearchParams();
@@ -11,18 +13,52 @@ export default function SuccessPage() {
   const [summary, setSummary] = useState(null);
 
   useEffect(() => {
-    if (!sessionId) return;
+    let cancelled = false;
 
-    const fetchSummary = async () => {
+    async function run() {
+      if (!sessionId) return;
+
       try {
-        const data = await getCheckoutSession(sessionId);
-        setSummary(data);
-      } catch {
-        setSummary(null);
-      }
-    };
+        const data = await getCheckoutSession(sessionId).catch(() => null);
+        if (!cancelled) setSummary(data);
 
-    fetchSummary();
+        const key = `atw_checkout_pending_${sessionId}`;
+        const doneKey = `atw_txn_done_${sessionId}`;
+
+        const fallbackKey = "atw_checkout_pending";
+
+        const raw =
+          sessionStorage.getItem(key) || sessionStorage.getItem(fallbackKey);
+        if (!raw) return;
+
+        if (sessionStorage.getItem(doneKey)) return;
+
+        const pending = JSON.parse(raw);
+
+        await createTransaction({
+          currency: pending.currency || "USD",
+          address: pending.address,
+          items: pending.items.map((i) => ({
+            productId: i.productId,
+            name: i.name,
+            unitAmountCents: i.unitAmountCents,
+            quantity: i.quantity,
+          })),
+        });
+
+        sessionStorage.setItem(doneKey, "1");
+        sessionStorage.removeItem(key);
+        sessionStorage.removeItem(fallbackKey);
+        clearCart();
+      } catch (e) {
+        console.error("Transaction creation failed:", e);
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
   }, [sessionId]);
 
   return (
