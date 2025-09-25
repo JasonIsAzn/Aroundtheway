@@ -43,6 +43,12 @@ const SAMPLE_PRODUCTS = [
   },
 ];
 
+function formatAddress(fs) {
+  return [fs.address, fs.city, fs.state, fs.zipCode, fs.country]
+    .filter(Boolean)
+    .join(", ");
+}
+
 const getStoredUser = () => {
   try {
     const raw = localStorage.getItem("user");
@@ -222,8 +228,6 @@ export default function CheckoutPage() {
       alert("Your cart is empty.");
       return;
     }
-
-    // optional: require full address before paying
     if (
       !formState.address ||
       !formState.city ||
@@ -237,15 +241,34 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
-      const items = cart.map((i) => ({
-        Name: i.name,
-        UnitAmountCents: i.unitAmountCents,
-        Quantity: i.quantity,
-        ImageUrl: i.imageUrl,
-        Currency: i.currency,
-      }));
-      const { url } = await startCheckout(items);
-      window.location.href = url; // Stripe Checkout redirect
+      const snapshot = {
+        address: formatAddress(formState),
+        currency: "USD",
+        items: getCart().map((i) => ({
+          productId: i.id,
+          name: i.name,
+          unitAmountCents: i.unitAmountCents,
+          quantity: i.quantity,
+          imageUrl: i.imageUrl,
+        })),
+      };
+
+      const { url, sessionId } = await startCheckout(
+        getCart().map((i) => ({
+          Name: i.name,
+          UnitAmountCents: i.unitAmountCents,
+          Quantity: i.quantity,
+          ImageUrl: i.imageUrl,
+          Currency: i.currency,
+        }))
+      );
+
+      const key = sessionId
+        ? `atw_checkout_pending_${sessionId}`
+        : `atw_checkout_pending`;
+      sessionStorage.setItem(key, JSON.stringify(snapshot));
+
+      window.location.href = url;
     } catch (err) {
       console.error(err);
       alert(err?.message || "Could not start checkout.");
