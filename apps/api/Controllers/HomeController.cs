@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Aroundtheway.Api.Controllers;
 
+[Authorize(Policy = "AdminOnly")]
 public class HomeController : Controller
 {
     private readonly AppDbContext _context;
@@ -19,11 +21,14 @@ public class HomeController : Controller
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
 
-        if (userId != null)
+        if (userId == null)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
-            ViewBag.CurrentUser = user;
+            return RedirectToAction("Login", "Account");
         }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);
+        ViewBag.CurrentUser = user;
+
         ViewData["Title"] = "Home Page";
         return View();
     }

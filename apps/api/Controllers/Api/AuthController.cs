@@ -4,14 +4,13 @@ using Aroundtheway.Api.Dtos.Auth;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.Services;
 using Aroundtheway.Api.ViewModels.Account;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Google.Apis.Auth;
 
 namespace Aroundtheway.Api.Controllers.Api;
-
 
 [ApiController]
 [Route("api/auth")]
@@ -32,32 +31,39 @@ public class AuthController : Controller
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Validation failed",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = string.Join(", ", ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage))
-            });
+            return BadRequest(
+                new ProblemDetails
+                {
+                    Title = "Validation failed",
+                    Status = StatusCodes.Status400BadRequest,
+                    Detail = string.Join(
+                        ", ",
+                        ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                    ),
+                }
+            );
         }
 
         var email = (dto.Email ?? "").Trim().ToLowerInvariant();
         var password = (dto.Password ?? "").Trim();
 
         if (await _context.Users.AsNoTracking().AnyAsync(u => u.Email == email))
-            return Conflict(new ProblemDetails
-            {
-                Title = "Email already in use",
-                Status = StatusCodes.Status409Conflict
-            });
-
+            return Conflict(
+                new ProblemDetails
+                {
+                    Title = "Email already in use",
+                    Status = StatusCodes.Status409Conflict,
+                }
+            );
 
         var user = await HandleRegister(email, password);
 
         HttpContext.Session.SetInt32("SessionUserId", user.Id);
 
-        return Created($"/api/users/{user.Id}", new RegisterResponse(user.Id, user.Email, user.IsAdmin));
+        return Created(
+            $"/api/users/{user.Id}",
+            new RegisterResponse(user.Id, user.Email, user.IsAdmin)
+        );
     }
 
     private async Task<User> HandleRegister(string email, string password)
@@ -78,7 +84,8 @@ public class AuthController : Controller
         var password = (dto.Password ?? "").Trim();
 
         var user = await HandleLogin(email, password);
-        if (user is null) return Unauthorized(new { message = "Invalid email or password." });
+        if (user is null)
+            return Unauthorized(new { message = "Invalid email or password." });
 
         HttpContext.Session.SetInt32("SessionUserId", user.Id);
 
@@ -92,7 +99,8 @@ public class AuthController : Controller
         vm.Email = (vm.Email ?? "").Trim().ToLowerInvariant();
         vm.Password = (vm.Password ?? "").Trim();
 
-        if (!ModelState.IsValid) return Problem("Invalid form data");
+        if (!ModelState.IsValid)
+            return Problem("Invalid form data");
 
         var user = await HandleLogin(vm.Email, vm.Password);
         if (user is null)
@@ -113,19 +121,22 @@ public class AuthController : Controller
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Email),
             new(ClaimTypes.Email, user.Email),
-            new("role", "admin")
+            new("role", "admin"),
         };
 
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var identity = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme
+        );
         var principal = new ClaimsPrincipal(identity);
 
-        var props = new AuthenticationProperties
-        {
-            IsPersistent = true,
-            AllowRefresh = true,
-        };
+        var props = new AuthenticationProperties { IsPersistent = true, AllowRefresh = true };
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            props
+        );
 
         HttpContext.Session.SetInt32("SessionUserId", user.Id);
 
@@ -134,12 +145,12 @@ public class AuthController : Controller
 
     private async Task<User?> HandleLogin(string email, string password)
     {
-        var user = await _context.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == email);
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email);
 
-        if (user == null) return null;
-        if (!_passwordService.Verify(password, user.PasswordHash!)) return null;
+        if (user == null)
+            return null;
+        if (!_passwordService.Verify(password, user.PasswordHash!))
+            return null;
 
         return user;
     }
@@ -148,37 +159,42 @@ public class AuthController : Controller
     public async Task<IActionResult> Me()
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
-        if (userId == null) return Unauthorized();
+        if (userId == null)
+            return Unauthorized();
 
         try
         {
             var user = await _context.Users.FindAsync(userId.Value);
-            if (user == null) return Unauthorized();
+            if (user == null)
+                return Unauthorized();
 
-            return Ok(new
-            {
-                user.Id,
-                user.Email,
-                user.IsAdmin,
-                user.CreatedAt,
-                user.UpdatedAt,
-                user.GoogleSub
-            });
+            return Ok(
+                new
+                {
+                    user.Id,
+                    user.Email,
+                    user.IsAdmin,
+                    user.CreatedAt,
+                    user.UpdatedAt,
+                    user.GoogleSub,
+                }
+            );
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             // Optionally log the exception here
-            return StatusCode(500, new { message = "An error occurred while retrieving user information." });
+            return StatusCode(
+                500,
+                new { message = "An error occurred while retrieving user information." }
+            );
         }
     }
-
 
     [HttpPost("logout")]
     [Consumes("application/json")]
     public IActionResult LogoutApi()
     {
-
         HttpContext.Session.Clear();
         return Ok(new { message = "Logged out successfully" });
     }
@@ -206,10 +222,7 @@ public class AuthController : Controller
         {
             payload = await GoogleJsonWebSignature.ValidateAsync(
                 dto.IdToken,
-                new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = [clientId]
-                }
+                new GoogleJsonWebSignature.ValidationSettings { Audience = [clientId] }
             );
         }
         catch (Exception)
@@ -220,9 +233,9 @@ public class AuthController : Controller
         var email = (payload.Email ?? "").Trim().ToLowerInvariant();
         var googleSub = payload.Subject;
 
-
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.GoogleSub == googleSub || u.Email == email);
+        var user = await _context.Users.FirstOrDefaultAsync(u =>
+            u.GoogleSub == googleSub || u.Email == email
+        );
 
         if (user == null)
         {
@@ -252,7 +265,10 @@ public class AuthController : Controller
     public async Task<IActionResult> GoogleLoginWeb([FromForm] GoogleLoginRequest dto)
     {
         if (string.IsNullOrWhiteSpace(dto.IdToken))
-            return View("../Account/Login", new LoginFormViewModel { Error = "Missing Google credential." });
+            return View(
+                "../Account/Login",
+                new LoginFormViewModel { Error = "Missing Google credential." }
+            );
 
         var clientId = "370878605755-ag67ab20l16ebblvkt5bbf65kcd5p40s.apps.googleusercontent.com";
 
@@ -261,15 +277,15 @@ public class AuthController : Controller
         {
             payload = await GoogleJsonWebSignature.ValidateAsync(
                 dto.IdToken,
-                new GoogleJsonWebSignature.ValidationSettings
-                {
-                    Audience = new[] { clientId }
-                }
+                new GoogleJsonWebSignature.ValidationSettings { Audience = new[] { clientId } }
             );
         }
         catch
         {
-            return View("../Account/Login", new LoginFormViewModel { Error = "Invalid Google token." });
+            return View(
+                "../Account/Login",
+                new LoginFormViewModel { Error = "Invalid Google token." }
+            );
         }
 
         var email = (payload.Email ?? "").Trim().ToLowerInvariant();
@@ -282,13 +298,18 @@ public class AuthController : Controller
             var byEmail = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (byEmail != null)
             {
-                var subOwner = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.GoogleSub == googleSub);
+                var subOwner = await _context
+                    .Users.AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.GoogleSub == googleSub);
                 if (subOwner != null && subOwner.Id != byEmail.Id)
                 {
-                    return View("../Account/Login", new LoginFormViewModel
-                    {
-                        Error = "This Google account is already linked to another user."
-                    });
+                    return View(
+                        "../Account/Login",
+                        new LoginFormViewModel
+                        {
+                            Error = "This Google account is already linked to another user.",
+                        }
+                    );
                 }
 
                 if (string.IsNullOrEmpty(byEmail.GoogleSub))
@@ -303,23 +324,36 @@ public class AuthController : Controller
         }
 
         if (user == null)
-            return View("../Account/Login", new LoginFormViewModel { Error = "No account found for this Google user." });
+            return View(
+                "../Account/Login",
+                new LoginFormViewModel { Error = "No account found for this Google user." }
+            );
 
         if (!user.IsAdmin)
-            return View("../Account/Login", new LoginFormViewModel { Error = "You are not an admin." });
+            return View(
+                "../Account/Login",
+                new LoginFormViewModel { Error = "You are not an admin." }
+            );
 
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Name, user.Email),
             new(ClaimTypes.Email, user.Email),
-            new("role", "admin")
+            new("role", "admin"),
         };
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var identity = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme
+        );
         var principal = new ClaimsPrincipal(identity);
         var props = new AuthenticationProperties { IsPersistent = true, AllowRefresh = true };
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            props
+        );
         HttpContext.Session.SetInt32("SessionUserId", user.Id);
 
         return RedirectToAction("Index", "Home");

@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Models;
-using Aroundtheway.Api.ViewModels.Users;
 using Aroundtheway.Api.ViewModels.Post;
+using Aroundtheway.Api.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Stripe;
 
 namespace Aroundtheway.Api.Controllers;
-
-
 
 [Route("admin")]
 [Authorize(Policy = "AdminOnly")]
@@ -29,8 +27,8 @@ public class AdminController : Controller
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
-        var users = await _context.Users
-            .AsNoTracking()
+        var users = await _context
+            .Users.AsNoTracking()
             .OrderBy(u => u.Id)
             .Select(u => new UserViewModel
             {
@@ -41,7 +39,7 @@ public class AdminController : Controller
                 UpdatedAt = u.UpdatedAt,
                 IsAdmin = u.IsAdmin,
                 Address = u.Address,
-                CreditCard = u.CreditCard
+                CreditCard = u.CreditCard,
             })
             .ToListAsync();
 

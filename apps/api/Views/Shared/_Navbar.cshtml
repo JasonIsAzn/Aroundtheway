@@ -1,0 +1,25 @@
+@using Microsoft.AspNetCore.Http
+
+@{
+    var userId = Context.Session.GetInt32("SessionUserId");
+}
+
+@if (userId != null)
+{
+    <nav class="bg-gray-800 text-white px-6 py-3 flex items-center justify-between">
+        <div class="flex space-x-6">
+            <a href="/home" class="hover:bg-gray-700 px-3 py-2 rounded">Home</a>
+            <a href="/posts" class="hover:bg-gray-700 px-3 py-2 rounded">Inventory</a>
+            <a href="/admin" class="hover:bg-gray-700 px-3 py-2 rounded">Admin</a>
+            <a href="/admin/transactions" class="hover:bg-gray-700 px-3 py-2 rounded">Transactions</a>
+        </div>
+
+        <div>
+            <form method="post" action="/api/auth/logout">
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+}

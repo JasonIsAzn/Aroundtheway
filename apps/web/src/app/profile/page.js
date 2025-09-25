@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getMe, updateMyAddress } from "@/lib/users.client"; // adjust path
+import { getMe, updateMyAddress } from "@/lib/users.client";
+import LogoutButton from "../components/LogoutButton";
+import { getMyTransactions } from "@/lib/transaction.client";
+
+const money = (cents, currency = "USD") =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+  }).format((cents || 0) / 100);
 
 export default function UserProfile() {
   const [email, setEmail] = useState("");
@@ -18,6 +26,8 @@ export default function UserProfile() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [txLoading, setTxLoading] = useState(true);
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -40,7 +50,22 @@ export default function UserProfile() {
         setIsLoading(false);
       }
     };
+
+    const loadTransactions = async () => {
+      setTxLoading(true);
+      try {
+        const list = await getMyTransactions();
+        setTransactions(Array.isArray(list) ? list : []);
+      } catch (e) {
+        console.error("Failed to load transactions", e);
+        setTransactions([]);
+      } finally {
+        setTxLoading(false);
+      }
+    };
+
     loadProfile();
+    loadTransactions();
   }, []);
 
   const handleChange = (e) => {
@@ -106,7 +131,7 @@ export default function UserProfile() {
 
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-5xl mx-auto space-y-8">
         <div className="bg-white shadow-sm rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
             <h1 className="text-2xl font-bold text-gray-900">
@@ -126,7 +151,7 @@ export default function UserProfile() {
               </div>
             </div>
 
-            {/* Optional metadata for your prototype */}
+            {/* Optional metadata */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="block text-gray-500">Google Sub</span>
@@ -286,6 +311,70 @@ export default function UserProfile() {
             </div>
           </form>
         </div>
+
+        <div className="bg-white shadow-sm rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">
+              My Transactions
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Your recent purchases (most recent first).
+            </p>
+          </div>
+
+          <div className="px-6 py-4 overflow-x-auto">
+            {txLoading ? (
+              <p className="text-gray-500">Loading transactions…</p>
+            ) : transactions.length === 0 ? (
+              <p className="text-gray-500">No transactions yet.</p>
+            ) : (
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-600">
+                    <th className="py-2 pr-4">ID</th>
+                    <th className="py-2 pr-4">Date</th>
+                    <th className="py-2 pr-4">Total</th>
+                    <th className="py-2 pr-4">Address</th>
+                    <th className="py-2 pr-4">Items</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {transactions.map((t) => (
+                    <tr key={t.id}>
+                      <td className="py-2 pr-4 font-mono">{t.id}</td>
+                      <td className="py-2 pr-4">
+                        {t.createdAt
+                          ? new Date(t.createdAt).toLocaleString()
+                          : "—"}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {money(
+                          t.totalCents,
+                          (t.currency || "USD").toUpperCase()
+                        )}
+                      </td>
+                      <td
+                        className="py-2 pr-4 truncate max-w-[280px]"
+                        title={t.address}
+                      >
+                        {t.address || "—"}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {Array.isArray(t.items) && t.items.length > 0
+                          ? t.items
+                              .map((i) => `${i.name} ×${i.quantity}`)
+                              .join(", ")
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        <LogoutButton />
       </div>
     </main>
   );

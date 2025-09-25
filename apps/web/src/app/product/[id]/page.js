@@ -1,35 +1,35 @@
 "use client";
-import { useState } from 'react';
-import Header from '../../components/Header';
+import { useState } from "react";
+import Header from "../../components/Header";
 import { useParams } from "next/navigation";
-import { useEffect } from 'react';
-import { apiFetch } from '@/lib/http.client';
+import { useEffect } from "react";
+import { apiFetch } from "@/lib/http.client";
 
 function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
-
+  
   const [myProduct, setMyProduct] = useState(null);
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      alert('Please select a size');
+      alert("Please select a size");
       return;
     }
     if (!selectedColor) {
-      alert('Please select a color');
+      alert("Please select a color");
       return;
     }
 
-    console.log('Adding to cart:', {
+    console.log("Adding to cart:", {
       productId: product.id,
       size: selectedSize,
       color: selectedColor,
-      quantity
+      quantity,
     });
-    alert('Added to cart!');
+    alert("Added to cart!");
   };
 
   const params = useParams();
@@ -54,7 +54,6 @@ useEffect(() => {
 }, [params.id]);
 
 console.log(myProduct);
-
 
 if (myProduct === null) return null;  
   return (

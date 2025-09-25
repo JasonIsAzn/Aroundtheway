@@ -1,0 +1,57 @@
+@using Aroundtheway.Api.ViewModels.Transactions
+@model IEnumerable<TransactionRowViewModel>
+
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<h2>Transactions</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No transactions found.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>User Id</th>
+                <th>Date</th>
+                <th>Total</th>
+                <th>Address</th>
+                <th>Items (summary)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.Id</td>
+                    <td>@(t.UserId?.ToString() ?? "guest")</td>
+                    <td>@t.CreatedAt.ToLocalTime().ToString("g")</td>
+                    <td>@t.TotalFormatted</td>
+                    <td title="@t.Address">@t.Address</td>
+                    <td>@t.ItemsSummary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h3>Details</h3>
+    <ul>
+        @foreach (var t in Model)
+        {
+            <li>
+                <strong>Transaction @t.Id</strong> — @t.TotalFormatted — @t.CreatedAt.ToLocalTime().ToString("g")
+                <ul>
+                    @foreach (var i in t.Items)
+                    {
+                        <li>@i.Name (@i.ProductId): @i.Quantity × @((i.UnitAmountCents / 100.0m).ToString("C"))</li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+}

@@ -1,69 +1,69 @@
 @using Aroundtheway.Api.ViewModels.Users
 @model UsersViewModel
 
-<div class="min-h-screen bg-gray-100 p-6">
-    <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">Users Directory</h1>
-
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            @foreach (var user in Model.Users)
-            {
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">User #@user.Id</h3>
-                        @if (!string.IsNullOrEmpty(user.GoogleSub))
-                        {
-                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Google Account</span>
-                        }
-                        else
-                        {
-                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Local Account</span>
-                        }
-                    </div>
-
-                    <div class="space-y-2 text-sm">
-                        <div>
-                            <span class="font-medium text-gray-700">Email:</span>
-                            <span class="text-gray-900">@user.Email</span>
-                        </div>
-
-                        @if (!string.IsNullOrEmpty(user.GoogleSub))
-                        {
-                            <div>
-                                <span class="font-medium text-gray-700">Google Sub:</span>
-                                <span class="text-gray-600 font-mono text-xs">@user.GoogleSub</span>
-                            </div>
-                        }
-
-                        <div>
-                            <span class="font-medium text-gray-700">Created:</span>
-                            <span class="text-gray-600">@user.CreatedAt.ToString("MMM d, yyyy")</span>
-                        </div>
-
-                        <div>
-                            <span class="font-medium text-gray-700">Last Updated:</span>
-                            <span class="text-gray-600">@user.UpdatedAt.ToString("MMM d, yyyy")</span>
-                        </div>
-
-                        @if (!string.IsNullOrEmpty(user.PasswordHash))
-                        {
-                            <div>
-                                <span class="font-medium text-gray-700">Auth Type:</span>
-                                <span class="text-gray-600">Password Protected</span>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-        </div>
-
-        @if (!Model.Users.Any())
-        {
-            <div class="text-center py-12">
-                <div class="text-gray-400 text-6xl mb-4">👤</div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
-                <p class="text-gray-500">There are no users registered in the system yet.</p>
-            </div>
-        }
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-lg font-light uppercase tracking-[.15em] text-black">User Directory</h1>
+        <a href="/admin"
+           class="inline-flex items-center px-6 py-[10px] text-xs font-light uppercase tracking-[.15em] text-black hover:text-black/70 focus:outline-none transition-colors">
+            Back to Admin
+        </a>
     </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-black/10">
+            <thead>
+                <tr class="bg-black/5">
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">#</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Email</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Google ID</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Auth Type</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Created</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Updated</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-black/5">
+                @foreach (var user in Model.Users)
+                {
+                    <tr class="hover:bg-black/[0.02] transition-colors">
+                        <td class="p-4 text-sm text-black/60">#@user.Id</td>
+                        <td class="p-4 text-sm">@user.Email</td>
+                        <td class="p-4 text-sm text-black/60 font-mono text-xs">
+                            @if (!string.IsNullOrEmpty(user.GoogleSub))
+                            {
+                                @user.GoogleSub
+                            }
+                            else
+                            {
+                                <span class="text-black/40">—</span>
+                            }
+                        </td>
+                        <td class="p-4">
+                            @if (!string.IsNullOrEmpty(user.GoogleSub))
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 text-[10px] font-light uppercase tracking-[.15em] bg-black text-white">
+                                    Google
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 text-[10px] font-light uppercase tracking-[.15em] bg-black/5 text-black">
+                                    Password
+                                </span>
+                            }
+                        </td>
+                        <td class="p-4 text-sm text-black/60">@user.CreatedAt.ToString("MMM d, yyyy")</td>
+                        <td class="p-4 text-sm text-black/60">@user.UpdatedAt.ToString("MMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (!Model.Users.Any())
+    {
+        <div class="flex items-center justify-center h-40 border border-black/10 mt-8">
+            <p class="text-xs uppercase tracking-[.15em] text-black/40">No users found</p>
+        </div>
+    }
 </div>

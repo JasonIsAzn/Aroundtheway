@@ -11,6 +11,10 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
     public DbSet<Post> Posts { get; set; } = null!;
+    public DbSet<Transaction> Transactions => Set<Transaction>();
+    public DbSet<TransactionItem> TransactionItems => Set<TransactionItem>();
+
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,7 +35,6 @@ public class AppDbContext : DbContext
 
 
         // Posts
-        // 1) JSON conversion for ImageUrls (List<string> -> string column)
         var jsonOptions = new JsonSerializerOptions { WriteIndented = false };
         var listToJsonConverter = new ValueConverter<List<string>, string>(
             v => JsonSerializer.Serialize(v ?? new List<string>(), jsonOptions),
@@ -44,9 +47,37 @@ public class AppDbContext : DbContext
             .HasConversion(listToJsonConverter)
             .HasColumnType("LONGTEXT");
 
-        // 2) Unique index on ProductId
         modelBuilder.Entity<Post>()
             .HasIndex(p => p.ProductId)
             .IsUnique();
+
+        // Transactions
+        modelBuilder.Entity<Transaction>(e =>
+        {
+            e.Property(t => t.Currency).HasMaxLength(3).IsRequired();
+            e.Property(t => t.Address).HasMaxLength(500).IsRequired();
+
+            e.HasOne(t => t.User)
+             .WithMany()
+             .HasForeignKey(t => t.UserId)
+             .OnDelete(DeleteBehavior.SetNull);
+
+            e.HasIndex(t => t.UserId);
+
+            e.HasMany(t => t.Items)
+             .WithOne(i => i.Transaction)
+             .HasForeignKey(i => i.TransactionId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<TransactionItem>(e =>
+        {
+            e.Property(i => i.ProductId).HasMaxLength(128).IsRequired();
+            e.Property(i => i.Name).HasMaxLength(200).IsRequired();
+            e.Property(i => i.UnitAmountCents).IsRequired();
+            e.Property(i => i.Quantity).IsRequired();
+        });
+
+
     }
 }

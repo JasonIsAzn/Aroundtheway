@@ -3,6 +3,8 @@
 import { register } from "@/lib/auth.client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { googleLogin } from "@/lib/auth.client";
 
 function RegistrationForm() {
   const router = useRouter();
@@ -152,16 +154,43 @@ function RegistrationForm() {
     setIsSubmitting(true);
 
     try {
-      await register(formState);
+      const user = await register(formState);
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      window.dispatchEvent(new Event("auth-changed"));
+
       router.push("/");
     } catch (err) {
       if (err.status === 409) {
-        console.log(err.message);
         setErrors({ email: "Email already in use" });
+      } else {
+        console.error("Registration failed:", err);
       }
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const onGoogleSuccess = async (credentialResponse) => {
+    try {
+      const idToken = credentialResponse.credential;
+      if (!idToken) throw new Error("Missing Google credential");
+
+      const user = await googleLogin(idToken);
+      console.log("Logged in via Google:", user);
+
+      localStorage.setItem("user", JSON.stringify(user));
+
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      alert(`Google login failed: ${err.message || "Unknown error"}`);
+    }
+  };
+
+  const onGoogleError = () => {
+    alert("Google login failed");
   };
 
   return (
@@ -319,6 +348,7 @@ function RegistrationForm() {
             </div>
           </form>
         </div>
+        <GoogleLogin onSuccess={onGoogleSuccess} onError={onGoogleError} />
       </div>
     </div>
   );

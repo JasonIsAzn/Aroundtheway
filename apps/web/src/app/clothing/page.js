@@ -1,13 +1,12 @@
-import ClothingBody from '../components/ClothingBody';
-import Header from '../components/Header';
+import ClothingBody from "../components/ClothingBody";
+import Header from "../components/Header";
 
 function ClothingPage() {
-    return (
-        <>
-            <Header/>
-            <ClothingBody/>
-        </>
-    );
+  return (
+    <>
+      <ClothingBody />
+    </>
+  );
 }
 
 export default ClothingPage;

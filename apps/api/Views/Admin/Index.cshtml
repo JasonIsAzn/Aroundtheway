@@ -7,56 +7,91 @@
     var info = TempData["Info"] as string;
 }
 
-<h1>Users</h1>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-lg font-light uppercase tracking-[.15em] text-black">Admin Dashboard</h1>
+        <a href="/posts" 
+           class="inline-flex items-center px-6 py-[10px] text-xs font-light uppercase tracking-[.15em] text-white bg-black hover:bg-gray-900 focus:outline-none transition-colors">
+            Manage Posts
+        </a>
+    </div>
 
-@if (!string.IsNullOrWhiteSpace(success))
-{
-    <div>@success</div>
-}
-@if (!string.IsNullOrWhiteSpace(error))
-{
-    <div>@error</div>
-}
-@if (!string.IsNullOrWhiteSpace(info))
-{
-    <div>@info</div>
-}
+    @if (!string.IsNullOrWhiteSpace(success))
+    {
+        <div class="mb-6 bg-green-50 p-4">
+            <p class="text-xs uppercase tracking-[.15em] text-green-800">@success</p>
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="mb-6 bg-red-50 p-4">
+            <p class="text-xs uppercase tracking-[.15em] text-red-800">@error</p>
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(info))
+    {
+        <div class="mb-6 bg-blue-50 p-4">
+            <p class="text-xs uppercase tracking-[.15em] text-blue-800">@info</p>
+        </div>
+    }
 
-<table border="1" cellpadding="6" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Email</th>
-            <th>GoogleSub</th>
-            <th>Role</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var u in Model)
-        {
-            <tr>
-                <td>@u.Id</td>
-                <td>@u.Email</td>
-                <td>@u.GoogleSub</td>
-                <td>@(u.IsAdmin ? "Admin" : "User")</td>
-                <td>
-                    @if (u.IsAdmin)
-                    {
-                        <form method="post" action="/admin/demote/@u.Id" style="display:inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit">Demote to User</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form method="post" action="/admin/promote/@u.Id" style="display:inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit">Promote to Admin</button>
-                        </form>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-black/10">
+            <thead>
+                <tr class="bg-black/5">
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">#</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Email</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Google ID</th>
+                    <th class="text-left p-4 text-xs font-light uppercase tracking-[.15em] text-black">Role</th>
+                    <th class="text-right p-4 text-xs font-light uppercase tracking-[.15em] text-black">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-black/5">
+                @foreach (var u in Model)
+                {
+                    <tr class="hover:bg-black/[0.02] transition-colors">
+                        <td class="p-4 text-sm text-black/60">#@u.Id</td>
+                        <td class="p-4 text-sm">@u.Email</td>
+                        <td class="p-4 text-sm text-black/60 font-mono text-xs">@u.GoogleSub</td>
+                        <td class="p-4">
+                            @if (u.IsAdmin)
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 text-[10px] font-light uppercase tracking-[.15em] bg-black text-white">
+                                    Admin
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center px-2.5 py-0.5 text-[10px] font-light uppercase tracking-[.15em] bg-black/5 text-black">
+                                    User
+                                </span>
+                            }
+                        </td>
+                        <td class="p-4 text-right">
+                            @if (u.IsAdmin)
+                            {
+                                <form method="post" action="/admin/demote/@u.Id" class="inline-block">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" 
+                                            class="text-xs font-light uppercase tracking-[.15em] text-red-600 hover:text-red-700 transition-colors">
+                                        Demote
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" action="/admin/promote/@u.Id" class="inline-block">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="text-xs font-light uppercase tracking-[.15em] text-black hover:text-black/70 transition-colors">
+                                        Promote
+                                    </button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
