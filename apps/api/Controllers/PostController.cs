@@ -11,7 +11,6 @@ namespace Aroundtheway.Api.Controllers
 {
     // All routes under /posts/...
     [Route("posts")]
-    [Authorize(Policy = "AdminOnly")]
     public class PostController : Controller
     {
         private readonly AppDbContext _db;
@@ -38,7 +37,6 @@ namespace Aroundtheway.Api.Controllers
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
         [Consumes("multipart/form-data")]
-        [RequestSizeLimit(50_000_000)]
         public async Task<IActionResult> CreatePost([FromForm] PostFormViewModel vm)
         {
             var sessionUserId = HttpContext.Session.GetInt32(SessionUserIdKey);
@@ -163,7 +161,6 @@ namespace Aroundtheway.Api.Controllers
         [HttpPost("{id:int}/update")]
         [ValidateAntiForgeryToken]
         [Consumes("multipart/form-data")]
-        [RequestSizeLimit(50_000_000)]
         public async Task<IActionResult> UpdatePost(int id, [FromForm] PostFormViewModel vm)
         {
             var userId = HttpContext.Session.GetInt32(SessionUserIdKey);

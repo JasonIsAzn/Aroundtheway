@@ -25,7 +25,7 @@ public class ProductsCatalogController : ControllerBase
                 p.ProductName,
                 p.Color,
                 p.Price,
-                p.ImageUrls.FirstOrDefault() ?? "",
+                p.ImageUrls,
                 (p.NumOfSmall + p.NumOfMedium + p.NumOfLarge + p.NumOfXLarge) > 0
             ))
             .ToListAsync();

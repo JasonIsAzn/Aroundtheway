@@ -5,7 +5,7 @@ public record ProductListItemDto(
     string ProductName,
     string Color,
     double Price,
-    string ThumbnailUrl,
+    List<string> ThumbnailUrl,
     bool InStock
 );
 

@@ -31,8 +31,8 @@ public class S3ImageStorageService : IImageStorageService
                 throw new ArgumentException($"File type {file.ContentType} is not allowed");
 
             // Validate file size (max 5MB)
-            if (file.Length > 5 * 1024 * 1024)
-                throw new ArgumentException("File size exceeds 5MB limit");
+            // if (file.Length > 5 * 1024 * 1024)
+            //     throw new ArgumentException("File size exceeds 5MB limit");
 
             // Generate unique filename
             var fileExtension = Path.GetExtension(file.FileName).ToLower();
