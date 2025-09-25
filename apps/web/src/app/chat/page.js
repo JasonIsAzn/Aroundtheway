@@ -1,59 +1,113 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/Header";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi! I'm your shopping assistant. How can I help you find the perfect item today?",
+      text: "Hi! I'm your shopping assistant. Choose a question below to get started.",
       sender: "bot",
       timestamp: new Date().toISOString(),
     },
   ]);
-  const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState([]);
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  // Fetch products data on component mount
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products");
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(data);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
 
+    fetchProducts();
+  }, []);
+
+  const handlePromptClick = async (prompt) => {
     const userMessage = {
       id: messages.length + 1,
-      text: inputMessage,
+      text: prompt,
       sender: "user",
       timestamp: new Date().toISOString(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInputMessage("");
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/chatbot/message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: inputMessage }),
-      });
+      let botResponse = "";
 
-      if (!response.ok) {
-        throw new Error("Failed to get response from chatbot");
+      // Generate responses based on backend data
+      if (prompt.includes("products available")) {
+        if (products.length > 0) {
+          const availableProducts = products.filter(p => p.inStock);
+          botResponse = `We currently have ${availableProducts.length} products available:\n\n${availableProducts
+            .slice(0, 5)
+            .map(p => `• ${p.productName} - ${p.color} ($${p.price})`)
+            .join('\n')}`;
+          if (availableProducts.length > 5) {
+            botResponse += `\n\n...and ${availableProducts.length - 5} more items!`;
+          }
+        } else {
+          botResponse = "I'm still loading our product catalog. Please try again in a moment.";
+        }
+      } else if (prompt.includes("price range")) {
+        if (products.length > 0) {
+          const prices = products.map(p => p.price);
+          const minPrice = Math.min(...prices);
+          const maxPrice = Math.max(...prices);
+          botResponse = `Our products range from $${minPrice.toFixed(2)} to $${maxPrice.toFixed(2)}. What's your budget?`;
+        } else {
+          botResponse = "I'm still loading pricing information. Please try again in a moment.";
+        }
+      } else if (prompt.includes("popular items")) {
+        if (products.length > 0) {
+          const popularItems = products.slice(0, 3);
+          botResponse = `Here are some of our popular items:\n\n${popularItems
+            .map(p => `• ${p.productName} in ${p.color} - $${p.price} ${p.inStock ? '✅ In Stock' : '❌ Out of Stock'}`)
+            .join('\n')}`;
+        } else {
+          botResponse = "I'm still loading our popular items. Please try again in a moment.";
+        }
+      } else if (prompt.includes("colors available")) {
+        if (products.length > 0) {
+          const colors = [...new Set(products.map(p => p.color))];
+          botResponse = `We have products available in these colors:\n${colors.join(', ')}`;
+        } else {
+          botResponse = "I'm still loading color options. Please try again in a moment.";
+        }
+      } else if (prompt.includes("stock")) {
+        if (products.length > 0) {
+          const inStock = products.filter(p => p.inStock).length;
+          const total = products.length;
+          botResponse = `Currently ${inStock} out of ${total} products are in stock. Would you like to see what's available?`;
+        } else {
+          botResponse = "I'm checking our inventory. Please try again in a moment.";
+        }
+      } else {
+        // Fallback for other prompts
+        botResponse = "Thanks for your question! I can help you with product information, pricing, stock availability, and more. Try one of the other prompts below.";
       }
-
-      const data = await response.json();
 
       const botMessage = {
         id: messages.length + 2,
-        text: data.message,
+        text: botResponse,
         sender: "bot",
-        timestamp: data.timestamp || new Date().toISOString(),
+        timestamp: new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Error generating response:", error);
       const errorMessage = {
         id: messages.length + 2,
         text: "Sorry, I'm having trouble right now. Please try again later.",
@@ -63,13 +117,6 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
     }
   };
 
@@ -146,47 +193,39 @@ export default function ChatPage() {
             )}
           </div>
 
-          {/* Input Area */}
+          {/* Predefined Prompts Area */}
           <div className="border-t border-gray-200 p-4">
-            <div className="flex space-x-4">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask me about products, sizing, shipping..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-sm"
-                disabled={isLoading}
-              />
-              <button
-                onClick={sendMessage}
-                disabled={isLoading || !inputMessage.trim()}
-                className="px-6 py-3 bg-black text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                Send
-              </button>
-            </div>
-
-            {/* Suggested Questions */}
-            <div className="mt-4">
-              <p className="text-xs text-gray-500 mb-2">Try asking:</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="mb-4">
+              <p className="text-sm font-medium text-gray-800 mb-3">Choose a question:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
-                  "What sizes do you have?",
-                  "Tell me about shipping",
-                  "How do I find my size?",
-                  "What's your return policy?",
-                ].map((suggestion, index) => (
+                  "What products are available?",
+                  "Show me your price range",
+                  "What are your popular items?",
+                  "What colors are available?",
+                  "Check stock availability",
+                  "Help me find my size",
+                ].map((prompt, index) => (
                   <button
                     key={index}
-                    onClick={() => setInputMessage(suggestion)}
-                    className="text-xs px-3 py-1 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+                    onClick={() => handlePromptClick(prompt)}
+                    className="p-3 text-sm text-left bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isLoading}
                   >
-                    {suggestion}
+                    <span className="font-medium text-black">{prompt}</span>
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Additional Info */}
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-500 text-center">
+                {products.length > 0
+                  ? `Showing information from ${products.length} products in our catalog`
+                  : "Loading product catalog..."
+                }
+              </p>
             </div>
           </div>
         </div>
