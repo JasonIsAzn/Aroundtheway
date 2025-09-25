@@ -11,21 +11,7 @@ function ProductCard({ front, back, description, price, productId = 1 }) {
   const handleCardClick = () => {
     window.location.href = `/product/${productId}`;
   };
-  async function getProducts() {
-    const res = await apiFetch("/api/products", {
-      method: "GET",
-    });
-    return res.json();
-  }
-
-  useEffect(() => {
-    const loadData = async () => {
-      const data = await getProducts();
-      console.log(data);
-    }
-    loadData();
-  },[])
-
+  
   return (
     <section className="cursor-pointer group" onClick={handleCardClick}>
       <div className="relative w-full aspect-square overflow-hidden bg-white">
@@ -58,54 +44,44 @@ function ProductCard({ front, back, description, price, productId = 1 }) {
 }
 
 function ClothingBody() {
+  const [products, setProducts] = useState(null);
+
+  async function getProducts() {
+    const res = await apiFetch("/api/products", {
+      method: "GET",
+    });
+    return res.json();
+  }
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await getProducts();
+      console.log(data);
+      setProducts(data);
+    }
+    loadData();
+  },[])
+
+  console.log(products);
+  if (products === null)
+  {
+    return null;
+  }  
   return (
-    
 
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 py-8 max-w-7xl mx-auto">
-      <ProductCard
-        productId={1}
-        front="/Archive/5_2a992873-e582-45db-98c5-1a6616ecac36.png"
-        back="/Archive/Shot_-20.jpg"
-        description="CLASSIC GEAR TEE PIGMENT DYED"
-        price="$45"
-      />
-      <ProductCard
-        productId={2}
-        front="/Archive/7.png"
-        back="/Archive/Shot_-22 copy.jpg"
-        description="CLASSIC GEAR TEE PIGMENT DYED"
-        price="$45"
-      />
-      <ProductCard
-        productId={3}
-        front="/Archive/1 (1).png"
-        back="/Archive/2_d355e303-8d2f-49aa-b204-82df5ddb8e7b.png"
-        description="CLASSIC GEAR TEE PIGMENT DYED"
-        price="$45"
-      />
-      <ProductCard
-        productId={4}
-        front="/Archive/83E18625-F356-4F61-A2F0-666CB918D569.jpg"
-        back="/Archive/42A0CA68-1A00-44FA-BCF1-021AEDBE96AE.jpg"
-        description="CLASSIC GEAR TEE PIGMENT DYED"
-        price="$45"
-      />
+      {products.map((product) => (
+        <ProductCard
+          key={product.id}
+          productId={product.id}
+          front={product.thumbnailUrl[0]}
+          back={product.thumbnailUrl[1]}
+          description={product.productName}
+          price={product.price}
+        />
 
-      <ProductCard
-        productId={5}
-        front="/Archive/1_eecc0c53-b2aa-4b25-aab7-72081eb3c6b1.png"
-        back="/Archive/1_eecc0c53-b2aa-4b25-aab7-72081eb3c6b1.png"
-        description="CLASSIC GEAR TEE PIGMENT DYED"
-        price="$45"
-      />
+      ))}
 
-      <ProductCard
-        productId={6}
-        front="/Archive/4 (1).png"
-        back="/Archive/4 (1).png"
-        description="CLASSIC GEAR TEE PIGMENT DYED"
-        price="$45"
-      />
     </div>
   );
 }
