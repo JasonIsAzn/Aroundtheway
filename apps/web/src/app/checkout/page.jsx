@@ -11,37 +11,13 @@ import {
   clearCart,
 } from "@/lib/cart";
 import { startCheckout } from "@/lib/checkout.client";
-import { getMe, updateMyAddress } from "@/lib/users.client"; // uses your apiFetch
+import { getMe, updateMyAddress } from "@/lib/users.client";
 
 const money = (cents, currency = "usd") =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format((cents || 0) / 100);
-
-const SAMPLE_PRODUCTS = [
-  {
-    id: "tee-classic",
-    name: "ATW Classic Tee",
-    unitAmountCents: 2500,
-    imageUrl: "https://picsum.photos/seed/tee/600/600",
-    currency: "usd",
-  },
-  {
-    id: "comb-std",
-    name: "ATW Comb",
-    unitAmountCents: 1500,
-    imageUrl: "https://picsum.photos/seed/comb/600/600",
-    currency: "usd",
-  },
-  {
-    id: "hoodie-black",
-    name: "ATW Black Hoodie",
-    unitAmountCents: 5900,
-    imageUrl: "https://picsum.photos/seed/hoodie/600/600",
-    currency: "usd",
-  },
-];
 
 function formatAddress(fs) {
   return [fs.address, fs.city, fs.state, fs.zipCode, fs.country]
@@ -63,6 +39,7 @@ export default function CheckoutPage() {
   const [cart, setCartState] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
 
   // address form
   const [formState, setFormState] = useState({
@@ -129,6 +106,9 @@ export default function CheckoutPage() {
         }
         const data = await getMe();
         if (canceled) return;
+
+        setUserEmail(data?.email || null);
+
         setFormState({
           address: data?.address?.address || "",
           city: data?.address?.city || "",
@@ -260,7 +240,8 @@ export default function CheckoutPage() {
           Quantity: i.quantity,
           ImageUrl: i.imageUrl,
           Currency: i.currency,
-        }))
+        })),
+        userEmail || "guest@example.com"
       );
 
       const key = sessionId
@@ -282,34 +263,6 @@ export default function CheckoutPage() {
       <h1 className="text-2xl font-semibold">
         {isLoggedIn ? "Checkout" : "Guest Checkout"}
       </h1>
-
-      {/* Sample products */}
-      <section className="space-y-3">
-        <h2 className="text-lg font-medium">Sample Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {SAMPLE_PRODUCTS.map((p) => (
-            <div key={p.id} className="rounded-xl border p-3 flex flex-col">
-              <img
-                src={p.imageUrl}
-                alt={p.name}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-              <div className="mt-3">
-                <div className="font-medium">{p.name}</div>
-                <div className="text-sm text-gray-600">
-                  {money(p.unitAmountCents, p.currency)}
-                </div>
-              </div>
-              <button
-                onClick={() => handleAdd(p)}
-                className="mt-auto rounded-lg px-3 py-2 bg-black text-white"
-              >
-                Add to cart
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Cart */}
       <section className="rounded-xl border p-4">

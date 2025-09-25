@@ -1,64 +1,22 @@
 "use client";
 import { useState } from "react";
-import Header from "../../components/Header";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { apiFetch } from "@/lib/http.client";
+import { addItem } from "@/lib/cart";
 
 function ProductDetails() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
-
-  const [myProduct, setMyProduct] = useState();
-  // Mock product data - would come from API/props in real implementation
-  const product = {
-    id: 1,
-    name: "CLASSIC GEAR TEE PIGMENT DYED",
-    price: 45,
-    images: [
-      "/Archive/5_2a992873-e582-45db-98c5-1a6616ecac36.png",
-      "/Archive/Shot_-20.jpg",
-      "/Archive/7.png",
-      "/Archive/Shot_-22 copy.jpg",
-    ],
-    colors: [
-      { name: "Black", value: "#000000" },
-      { name: "White", value: "#FFFFFF" },
-      { name: "Grey", value: "#808080" },
-      { name: "Navy", value: "#1E3A8A" },
-    ],
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    description:
-      "Premium quality pigment dyed tee with classic gear design. Made from 100% organic cotton for ultimate comfort and durability.",
-    inStock: true,
-    sku: "STY-001-BLK",
-  };
-
-  const handleAddToCart = () => {
-    if (!selectedSize) {
-      alert("Please select a size");
-      return;
-    }
-    if (!selectedColor) {
-      alert("Please select a color");
-      return;
-    }
-
-    console.log("Adding to cart:", {
-      productId: product.id,
-      size: selectedSize,
-      color: selectedColor,
-      quantity,
-    });
-    alert("Added to cart!");
-  };
+  const [myProduct, setMyProduct] = useState(null);
 
   const params = useParams();
+  const router = useRouter();
 
   async function getProduct(id) {
-    const res = await apiFetch(`/api/products/${id}`); // no body on GET
+    const res = await apiFetch(`/api/products/${id}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
   }
@@ -68,6 +26,7 @@ function ProductDetails() {
     (async () => {
       try {
         const data = await getProduct(params.id);
+        console.log(data);
         setMyProduct(data);
       } catch (err) {
         console.error(err);
@@ -75,184 +34,118 @@ function ProductDetails() {
     })();
   }, [params.id]);
 
+  console.log(myProduct);
+
+  if (myProduct === null) return null;
+
+  const cartItem = {
+    id: myProduct.id ?? params.id,
+    name: myProduct.productName ?? myProduct.name ?? "Product",
+    unitAmountCents:
+      myProduct.unitAmountCents ??
+      myProduct.priceCents ??
+      (typeof myProduct.price === "number"
+        ? Math.round(myProduct.price * 100)
+        : undefined),
+    currency: (myProduct.currency ?? "usd").toLowerCase(),
+    imageUrl: myProduct.imageUrls[0] ?? "",
+  };
+
+  const handleBuyNow = () => {
+    addItem(cartItem, quantity);
+    alert(`Added ${quantity} × ${cartItem.name} to cart.`);
+    router.push("/checkout");
+  };
+
   return (
     <>
-      <div className="min-h-screen bg-white">
-        <div className="max-w-6xl mx-auto px-4 py-8 lg:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Image Gallery - Left Side */}
-            <div className="space-y-4">
-              {/* Main Image */}
-              <div className="aspect-square bg-gray-50 overflow-hidden">
-                <img
-                  src={product.images[selectedImage]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+      {/* left product image*/}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <section className="space-y-4">
+          <div className="relative w-full bg-white aspect-square overflow-hidden rounded-xl">
+            <img
+              src={myProduct.imageUrls[0]}
+              alt={myProduct.productName}
+              className="w-full h-full object-contain"
+            />
+          </div>
+        </section>
 
-              {/* Thumbnail Gallery */}
-              <div className="grid grid-cols-4 gap-2">
-                {product.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square bg-gray-50 overflow-hidden border ${
-                      selectedImage === index
-                        ? "border-black border-2"
-                        : "border-gray-200"
-                    } hover:border-gray-400 transition-colors`}
-                  >
-                    <img
-                      src={image}
-                      alt={`View ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* right product details */}
+        <section className="flex flex-col justify-center">
+          {/* name & price */}
+          <div className="mb-6">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
+              {myProduct.productName}
+            </h1>
+            <p className="mt-2 text-base">${myProduct.price}</p>
+          </div>
 
-            {/* Product Information - Right Side */}
-            <div className="space-y-8">
-              {/* Product Name and Price */}
-              <div className="space-y-2">
-                <h1 className="text-2xl lg:text-3xl font-light tracking-wide uppercase">
-                  {product.name}
-                </h1>
-                <p className="text-xl font-medium">${product.price}</p>
-                <p className="text-sm text-gray-600">SKU: {product.sku}</p>
-              </div>
-
-              {/* Color Selection */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium uppercase tracking-wide">
-                  Color:{" "}
-                  {selectedColor && (
-                    <span className="font-normal">{selectedColor}</span>
-                  )}
-                </h3>
-                <div className="flex space-x-3">
-                  {product.colors.map((color) => (
-                    <button
-                      key={color.name}
-                      onClick={() => setSelectedColor(color.name)}
-                      className={`w-8 h-8 border-2 ${
-                        selectedColor === color.name
-                          ? "border-black"
-                          : "border-gray-300"
-                      } hover:border-gray-400 transition-colors`}
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                    >
-                      {color.value === "#FFFFFF" && (
-                        <div className="w-full h-full border border-gray-200"></div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Size Selection */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium uppercase tracking-wide">
-                  Size:{" "}
-                  {selectedSize && (
-                    <span className="font-normal">{selectedSize}</span>
-                  )}
-                </h3>
-                <div className="grid grid-cols-5 gap-2">
-                  {product.sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`py-3 border text-sm font-medium transition-colors ${
-                        selectedSize === size
-                          ? "border-black bg-black text-white"
-                          : "border-gray-300 hover:border-gray-400"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Quantity */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium uppercase tracking-wide">
-                  Quantity
-                </h3>
-                <div className="flex items-center space-x-4 max-w-32">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 border border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors text-lg"
-                  >
-                    −
-                  </button>
-                  <span className="text-lg font-medium min-w-[2rem] text-center">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 border border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors text-lg"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Add to Cart Button */}
+          {/* color */}
+          <div className="mb-6">
+            <p className="text-xs uppercase text-gray-500 mb-2">Color</p>
+            <div className="flex items-center gap-3">
               <button
-                onClick={handleAddToCart}
-                className={`w-full py-4 font-medium text-sm uppercase tracking-wider transition-colors ${
-                  product.inStock
-                    ? "bg-black text-white hover:bg-gray-800"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                type="button"
+                onClick={() => setSelectedColor(myProduct.color)}
+                className={`w-10 h-10 rounded-md border ${
+                  selectedColor === myProduct.color
+                    ? "border-black"
+                    : "border-gray-300"
                 }`}
-                disabled={!product.inStock}
+                style={{ backgroundColor: myProduct.color }}
+                title={myProduct.color}
               >
-                {product.inStock ? "ADD TO CART" : "OUT OF STOCK"}
+                <span className="sr-only">{myProduct.color}</span>
               </button>
-
-              {/* Stock Status */}
-              <div className="text-sm">
-                {product.inStock ? (
-                  <p className="text-green-600">✓ In Stock</p>
-                ) : (
-                  <p className="text-red-600">Out of Stock</p>
-                )}
-              </div>
-
-              {/* Product Description */}
-              <div className="space-y-3 border-t pt-8">
-                <h3 className="text-sm font-medium uppercase tracking-wide">
-                  Details
-                </h3>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {product.description}
-                </p>
-              </div>
-
-              {/* Additional Info */}
-              <div className="space-y-4 text-xs text-gray-600 border-t pt-8">
-                <div>
-                  <p className="font-medium">SHIPPING & RETURNS</p>
-                  <p>
-                    Free shipping on orders over $100. Returns accepted within
-                    30 days.
-                  </p>
-                </div>
-                <div>
-                  <p className="font-medium">SIZE GUIDE</p>
-                  <button className="underline hover:no-underline">
-                    View size chart
-                  </button>
-                </div>
-              </div>
+              <span className="text-sm text-gray-700">
+                {selectedColor || "Select color"}
+              </span>
             </div>
           </div>
-        </div>
+
+          {/* sizes (static demo for now) */}
+          <div className="mb-6">
+            <p className="text-xs uppercase text-gray-500 mb-2">Size</p>
+            <div className="flex flex-wrap gap-2">
+              {["S", "M", "L", "XL", "XXL"].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setSelectedSize(s)}
+                  className={`px-3 py-2 text-sm border rounded-md ${
+                    selectedSize === s ? "border-black" : "border-gray-300"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
+              −
+            </button>
+            <span>{quantity}</span>
+            <button onClick={() => setQuantity((q) => q + 1)}>+</button>
+          </div>
+
+          {/* add to bag */}
+          <div className="mt-8">
+            <button
+              onClick={handleBuyNow}
+              disabled={!selectedSize || !selectedColor}
+              className={`w-full h-14 text-white font-medium rounded-none ${
+                !selectedSize || !selectedColor
+                  ? "bg-black/60 cursor-not-allowed"
+                  : "bg-black hover:opacity-90"
+              }`}
+            >
+              ADD TO BAG
+            </button>
+          </div>
+        </section>
       </div>
     </>
   );
