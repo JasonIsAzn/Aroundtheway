@@ -48,6 +48,7 @@ function ProductDetails() {
         ? Math.round(myProduct.price * 100)
         : undefined),
     currency: (myProduct.currency ?? "usd").toLowerCase(),
+    imageUrl: myProduct.imageUrls[0] ?? "",
   };
 
   const handleBuyNow = () => {
