@@ -6,18 +6,18 @@
 
 @if (userId != null)
 {
-    <nav class="bg-gray-800 text-white px-6 py-3 flex items-center justify-between">
+<nav class="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
         <div class="flex space-x-6">
-            <a href="/home" class="hover:bg-gray-700 px-3 py-2 rounded">Home</a>
-            <a href="/posts" class="hover:bg-gray-700 px-3 py-2 rounded">Inventory</a>
-            <a href="/admin" class="hover:bg-gray-700 px-3 py-2 rounded">Admin</a>
-            <a href="/admin/transactions" class="hover:bg-gray-700 px-3 py-2 rounded">Transactions</a>
+            <a href="/home" class="text-sm font-medium text-black hover:text-gray-600 transition-colors px-3 py-2">HOME</a>
+            <a href="/posts" class="text-sm font-medium text-black hover:text-gray-600 transition-colors px-3 py-2">INVENTORY</a>
+            <a href="/admin" class="text-sm font-medium text-black hover:text-gray-600 transition-colors px-3 py-2">ADMIN</a>
+            <a href="/admin/transactions" class="text-sm font-medium text-black hover:text-gray-600 transition-colors px-3 py-2">TRANSACTIONS</a>
         </div>
 
         <div>
             <form method="post" action="/api/auth/logout">
-                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
-                    Logout
+                <button type="submit" class="px-6 py-2 bg-black text-white hover:bg-gray-900 transition-colors text-sm font-medium">
+                    LOGOUT
                 </button>
             </form>
         </div>
