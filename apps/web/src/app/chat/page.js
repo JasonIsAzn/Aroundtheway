@@ -31,7 +31,7 @@ export default function ChatPage() {
       await new Promise(resolve => setTimeout(resolve, 1200));
 
       // Call the backend ChatBot API
-      const response = await fetch("/api/chatbot/message", {
+      const response = await fetch("/api/chat/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,10 +43,10 @@ export default function ChatPage() {
 
       if (response.ok) {
         const data = await response.json();
-        botResponse = data.response || "I'm here to help! How can I assist you today?";
+        botResponse = data.message || "I'm here to help! How can I assist you today?";
       } else {
-        console.error("API Error:", response.status, response.statusText);
-        botResponse = "I'm having trouble connecting to our systems right now. Please try again in a moment.";
+        console.error("API Error:", response?.status || 'Unknown status', response?.statusText || 'Unknown error');
+botResponse = "I'm having trouble connecting to our systems right now. Please try again in a moment.";
       }
 
       const botMessage = {
