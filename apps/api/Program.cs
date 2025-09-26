@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
-using OpenAI.Chat;
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Services;
 using OpenAI.Chat;
