@@ -1,9 +1,13 @@
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using OpenAI.Chat;
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Models;
 using Aroundtheway.Api.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using OpenAI.Chat;
 
 namespace Aroundtheway.Api.Controllers.Api;
 
@@ -52,7 +56,8 @@ public class ChatBotController : ControllerBase
                               $"Here's our current inventory: {productInfo} " +
                               "Sizes available: Small, Medium, Large, XLarge. " +
                               "If asked about specific products, refer to this inventory. " +
-                              "If you don't know specific details, suggest they browse the catalog or contact customer service.";
+                              "If you don't know specific details, suggest they browse the catalog or contact customer service. " +
+                              "Use emojis in your responses to make them more engaging.";
 
             var openAIMessages = new OpenAI.Chat.ChatMessage[]
             {
