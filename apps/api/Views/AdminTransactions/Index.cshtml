@@ -2,56 +2,68 @@
 @model IEnumerable<TransactionRowViewModel>
 
 @{
-    ViewData["Title"] = "Transactions";
+    ViewData["Title"] = "TRANSACTIONS";
 }
 
-<h2>Transactions</h2>
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold tracking-[.15em] uppercase mb-6">Transactions</h2>
 
 @if (Model == null || !Model.Any())
 {
-    <p>No transactions found.</p>
+        <p>No transactions found.</p>
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>User Id</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Address</th>
-                <th>Items (summary)</th>
-            </tr>
-        </thead>
-        <tbody>
+        <div class="bg-white rounded-lg border border-black/10 overflow-hidden">
+            <table class="w-full table-auto">
+                <thead class="bg-gray-50 uppercase tracking-[.15em] text-sm">
+                    <tr class="border-b border-black/10">
+                        <th class="px-4 py-3 text-left">ID</th>
+                        <th class="px-4 py-3 text-left">User ID</th>
+                        <th class="px-4 py-3 text-left">Date</th>
+                        <th class="px-4 py-3 text-right">Total</th>
+                        <th class="px-4 py-3 text-left">Address</th>
+                        <th class="px-4 py-3 text-left">Items</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model)
+                    {
+                        <tr class="border-b border-black/10 hover:bg-gray-50">
+                            <td class="px-4 py-3">@t.Id</td>
+                            <td class="px-4 py-3">@(t.UserId?.ToString() ?? "guest")</td>
+                            <td class="px-4 py-3">@t.CreatedAt.ToLocalTime().ToString("g")</td>
+                            <td class="px-4 py-3 text-right font-medium">@t.TotalFormatted</td>
+                            <td class="px-4 py-3" title="@t.Address">@t.Address</td>
+                            <td class="px-4 py-3">@t.ItemsSummary</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+        <h3 class="text-xl font-bold tracking-[.15em] uppercase mt-8 mb-4">Transaction Details</h3>
+        <ul class="space-y-6">
             @foreach (var t in Model)
             {
-                <tr>
-                    <td>@t.Id</td>
-                    <td>@(t.UserId?.ToString() ?? "guest")</td>
-                    <td>@t.CreatedAt.ToLocalTime().ToString("g")</td>
-                    <td>@t.TotalFormatted</td>
-                    <td title="@t.Address">@t.Address</td>
-                    <td>@t.ItemsSummary</td>
-                </tr>
+                <li class="bg-white rounded-lg border border-black/10 p-4">
+                    <div class="font-medium mb-2">
+                        <span class="tracking-[.15em] uppercase">Transaction @t.Id</span>
+                        <span class="mx-2">—</span>
+                        <span class="font-bold">@t.TotalFormatted</span>
+                        <span class="mx-2">—</span>
+                        <span class="text-gray-600">@t.CreatedAt.ToLocalTime().ToString("g")</span>
+                    </div>
+                    <ul class="space-y-1 text-sm">
+                        @foreach (var i in t.Items)
+                        {
+                            <li class="text-gray-600">@i.Name <span class="text-gray-400">(#@i.ProductId)</span>: @i.Quantity ×
+                                @((i.UnitAmountCents / 100.0m).ToString("C"))</li>
+                        }
+                    </ul>
+                </li>
             }
-        </tbody>
-    </table>
-
-    <h3>Details</h3>
-    <ul>
-        @foreach (var t in Model)
-        {
-            <li>
-                <strong>Transaction @t.Id</strong> — @t.TotalFormatted — @t.CreatedAt.ToLocalTime().ToString("g")
-                <ul>
-                    @foreach (var i in t.Items)
-                    {
-                        <li>@i.Name (@i.ProductId): @i.Quantity × @((i.UnitAmountCents / 100.0m).ToString("C"))</li>
-                    }
-                </ul>
-            </li>
-        }
-    </ul>
+        </ul>
 }
+</div>
