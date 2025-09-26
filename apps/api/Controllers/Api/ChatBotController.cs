@@ -1,5 +1,9 @@
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using OpenAI.Chat;
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.Models;
@@ -28,12 +32,7 @@ public class ChatBotController : ControllerBase
     [HttpPost("message")]
     public async Task<IActionResult> SendMessage([FromBody] ChatMessageRequestViewModel request)
     {
-        // Authentication check
-        // TODO: Re-enable authentication for production
-        // if (!IsLoggedIn)
-        // {
-        //     return Unauthorized(new { error = "Please log in to use the chat feature." });
-        // }
+        // Authentication check - disabled for demo
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -41,10 +40,24 @@ public class ChatBotController : ControllerBase
 
         try
         {
+            // Get backend data for context
+            var products = await _context.Posts.AsNoTracking()
+                .Select(p => new { p.ProductName, p.Color, p.Price, p.NumOfSmall, p.NumOfMedium, p.NumOfLarge, p.NumOfXLarge })
+                .Take(10)
+                .ToListAsync();
+
+            var productInfo = products.Any()
+                ? "Current products: " + string.Join(", ", products.Select(p => $"{p.ProductName} in {p.Color} ($${p.Price:F2})"))
+                : "No products currently in stock.";
+
             var systemPrompt = "You are a helpful shopping assistant for an e-commerce clothing store called 'Aroundtheway'. " +
                               "Help users find products, answer questions about sizing, materials, shipping, and returns. " +
                               "Be friendly, concise, and focus on helping with shopping decisions. " +
-                              "If you don't know specific product details, suggest they browse the catalog or contact customer service.";
+                              $"Here's our current inventory: {productInfo} " +
+                              "Sizes available: Small, Medium, Large, XLarge. " +
+                              "If asked about specific products, refer to this inventory. " +
+                              "If you don't know specific details, suggest they browse the catalog or contact customer service. " +
+                              "Use emojis in your responses to make them more engaging.";
 
             var openAIMessages = new OpenAI.Chat.ChatMessage[]
             {
@@ -52,8 +65,8 @@ public class ChatBotController : ControllerBase
                 new UserChatMessage(request.Message)
             };
 
-            var chatCompletion = await _chatClient.CompleteChatAsync(openAIMessages);
-            var botResponse = chatCompletion.Value.Content[0].Text;
+var chatCompletion = await _chatClient.CompleteChatAsync(openAIMessages);
+var botResponse = chatCompletion.Value.Content[0].Text;
 
             // Save to database if user is logged in
             Models.ChatMessage? chatMessage = null;
@@ -89,7 +102,6 @@ public class ChatBotController : ControllerBase
         }
     }
 
-    // Get chat history endpoint
     [HttpGet("history")]
     public async Task<IActionResult> GetChatHistory()
     {
