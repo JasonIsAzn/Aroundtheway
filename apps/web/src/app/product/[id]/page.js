@@ -37,6 +37,9 @@ function ProductDetails() {
   console.log(myProduct);
 
   if (myProduct === null) return null;
+  const selectedCount =
+  selectedSize ? (myProduct.sizes?.[selectedSize] ?? 0) : 0;
+  const canBuy = Boolean(selectedColor) && Boolean(selectedSize) && selectedCount > 0;
 
   const cartItem = {
     id: myProduct.id ?? params.id,
@@ -64,10 +67,37 @@ function ProductDetails() {
         <section className="space-y-4">
           <div className="relative w-full bg-white aspect-square overflow-hidden rounded-xl">
             <img
-              src={myProduct.imageUrls[0]}
+              src={myProduct.imageUrls[selectedImage]}
               alt={myProduct.productName}
               className="w-full h-full object-contain"
             />
+
+            {/* Left Arrow */}
+            {/* Left Arrow */}
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedImage(
+                  (prev) =>
+                    (prev - 1 + myProduct.imageUrls.length) % myProduct.imageUrls.length
+                )
+              }
+              className="absolute top-1/2 left-3 -translate-y-1/2 text-3xl text-gray-700 hover:text-black"
+            >
+              ‹
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              type="button"
+              onClick={() =>
+                setSelectedImage((prev) => (prev + 1) % myProduct.imageUrls.length)
+              }
+              className="absolute top-1/2 right-3 -translate-y-1/2 text-3xl text-gray-700 hover:text-black"
+            >
+              ›
+            </button>
+
           </div>
         </section>
 
@@ -105,23 +135,31 @@ function ProductDetails() {
           </div>
 
           {/* sizes (static demo for now) */}
+          {/* sizes from API */}
           <div className="mb-6">
             <p className="text-xs uppercase text-gray-500 mb-2">Size</p>
             <div className="flex flex-wrap gap-2">
-              {["S", "M", "L", "XL", "XXL"].map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSelectedSize(s)}
-                  className={`px-3 py-2 text-sm border rounded-md ${
-                    selectedSize === s ? "border-black" : "border-gray-300"
-                  }`}
-                >
-                  {s}
-                </button>
-              ))}
+              {Object.entries(myProduct.sizes ?? {}).map(([size, count]) => {
+                const isOutOfStock = (count ?? 0) <= 0;
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    disabled={isOutOfStock}
+                    onClick={() => !isOutOfStock && setSelectedSize(size)}
+                    className={`px-3 py-2 text-sm border rounded-md relative
+                      ${selectedSize === size ? "border-black" : "border-gray-300"}
+                      ${isOutOfStock ? "bg-gray-200 text-gray-400 cursor-not-allowed line-through" : ""}
+                    `}
+                    title={isOutOfStock ? `${size} - Out of stock` : `${size} - In stock`}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
             </div>
           </div>
+
 
           <div className="flex flex-col">
             <p className="text-xs uppercase text-gray-500 mb-2">Quantity</p>
@@ -149,11 +187,9 @@ function ProductDetails() {
           <div className="mt-8">
             <button
               onClick={handleBuyNow}
-              disabled={!selectedSize || !selectedColor}
+              disabled={!canBuy}
               className={`w-full h-14 text-white font-medium rounded-none ${
-                !selectedSize || !selectedColor
-                  ? "bg-black/60 cursor-not-allowed"
-                  : "bg-black hover:opacity-90"
+                !canBuy ? "bg-black/60 cursor-not-allowed" : "bg-black hover:opacity-90"
               }`}
             >
               ADD TO BAG
