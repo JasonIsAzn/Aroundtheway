@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Aroundtheway.Api.Controllers;
 
-// [Authorize(Policy = "AdminOnly")] // TEMP: Disabled for demo
+[Authorize(Policy = "AdminOnly")]
 public class HomeController : Controller
 {
     private readonly AppDbContext _context;
@@ -21,12 +21,9 @@ public class HomeController : Controller
     {
         var userId = HttpContext.Session.GetInt32("SessionUserId");
 
-        // TEMPORARY: Use first admin user for demo
         if (userId == null)
         {
-            var firstAdmin = await _context.Users.FirstOrDefaultAsync(u => u.IsAdmin);
-            userId = firstAdmin?.Id ?? 1;
-            HttpContext.Session.SetInt32("SessionUserId", userId.Value);
+            return RedirectToAction("Login", "Account");
         }
 
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId.Value);

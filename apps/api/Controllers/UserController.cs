@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Aroundtheway.Api.Controllers;
 
 [Route("user")]
-// [Authorize(Policy = "AdminOnly")] // TEMP: Disabled for demo
+[Authorize(Policy = "AdminOnly")]
 public class UserController : Controller
 {
     private readonly AppDbContext _context;

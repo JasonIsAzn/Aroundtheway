@@ -138,8 +138,7 @@ namespace Aroundtheway.Api.Controllers
 
             var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
             if (post is null) return NotFound();
-            // TEMP: Disabled ownership check for demo
-            // if (post.UserId != uid) return Forbid();
+            if (post.UserId != uid) return Forbid();
 
             var vm = new PostFormViewModel
             {
@@ -169,8 +168,7 @@ namespace Aroundtheway.Api.Controllers
 
             var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
             if (post is null) return NotFound();
-            // TEMP: Disabled ownership check for demo
-            // if (post.UserId != uid) return Forbid();
+            if (post.UserId != uid) return Forbid();
 
             vm.ProductName = (vm.ProductName ?? "").Trim();
             vm.Color = (vm.Color ?? "").Trim();
@@ -237,8 +235,7 @@ namespace Aroundtheway.Api.Controllers
 
             var post = await _db.Posts.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
             if (post is null) return NotFound();
-            // TEMP: Disabled ownership check for demo
-            // if (post.UserId != uid) return Forbid();
+            if (post.UserId != uid) return Forbid();
 
             var vm = new ConfirmDeleteViewModel { Id = post.Id, ProductName = post.ProductName };
             return View("ConfirmDelete", vm);
@@ -254,8 +251,7 @@ namespace Aroundtheway.Api.Controllers
 
             var post = await _db.Posts.FirstOrDefaultAsync(p => p.Id == id);
             if (post is null) return NotFound();
-            // TEMP: Disabled ownership check for demo
-            // if (post.UserId != uid) return Forbid();
+            if (post.UserId != uid) return Forbid();
 
             _db.Posts.Remove(post);
             await _db.SaveChangesAsync();

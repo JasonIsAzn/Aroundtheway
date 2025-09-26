@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Aroundtheway.Api.Controllers;
 
 [Route("admin/transactions")]
-// [Authorize(Policy = "AdminOnly")] // TEMP: Disabled for demo
+[Authorize(Policy = "AdminOnly")]
 public class AdminTransactionsController : Controller
 {
     private readonly AppDbContext _db;
@@ -19,10 +19,9 @@ public class AdminTransactionsController : Controller
     {
         var uid = HttpContext.Session.GetInt32("SessionUserId");
 
-        // TEMP: Disabled admin check for demo
-        // var me = _db.Users.AsNoTracking().FirstOrDefault(u => u.Id == uid!.Value);
-        // if (me is null || !me.IsAdmin)
-        //     return Forbid();
+        var me = _db.Users.AsNoTracking().FirstOrDefault(u => u.Id == uid!.Value);
+        if (me is null || !me.IsAdmin)
+            return Forbid();
 
         var vms = _db
             .Transactions.AsNoTracking()

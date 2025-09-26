@@ -12,7 +12,7 @@ using Stripe;
 namespace Aroundtheway.Api.Controllers;
 
 [Route("admin")]
-// [Authorize(Policy = "AdminOnly")] // TEMP: Disabled for demo
+[Authorize(Policy = "AdminOnly")]
 public class AdminController : Controller
 {
     private readonly AppDbContext _context;
