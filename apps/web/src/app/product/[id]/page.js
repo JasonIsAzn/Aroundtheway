@@ -88,7 +88,7 @@ function ProductDetails() {
               <button
                 type="button"
                 onClick={() => setSelectedColor(myProduct.color)}
-                className={`w-10 h-10 rounded-md border ${
+                className={`w-8 h-8 rounded-md border ${
                   selectedColor === myProduct.color
                     ? "border-black"
                     : "border-gray-300"
@@ -123,13 +123,27 @@ function ProductDetails() {
             </div>
           </div>
 
-          <div>
-            <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
-              −
-            </button>
-            <span>{quantity}</span>
-            <button onClick={() => setQuantity((q) => q + 1)}>+</button>
+          <div className="flex flex-col">
+            <p className="text-xs uppercase text-gray-500 mb-2">Quantity</p>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100"
+              >
+                −
+              </button>
+              <span className="min-w-[2rem] text-center">{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100"
+              >
+                +
+              </button>
+            </div>
           </div>
+
 
           {/* add to bag */}
           <div className="mt-8">
