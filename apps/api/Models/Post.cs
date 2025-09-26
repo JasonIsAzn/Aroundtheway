@@ -20,7 +20,8 @@ public class Post
 
     // Folder/slug used for image uploads (auto-generated)
     public string ProductId { get; set; } = string.Empty;
-    //Image Urls    
+
+    //Image Urls
     public List<string> ImageUrls { get; set; } = new();
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

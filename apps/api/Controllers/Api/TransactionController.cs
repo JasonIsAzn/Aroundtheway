@@ -10,13 +10,15 @@ using Microsoft.EntityFrameworkCore;
 public class TransactionsController : ControllerBase
 {
     private readonly AppDbContext _db;
+
     public TransactionsController(AppDbContext db) => _db = db;
 
     // POST /api/transactions
     [HttpPost]
     public ActionResult<TransactionDto> Create([FromBody] CreateTransactionRequest dto)
     {
-        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
         if (dto.Items is null || dto.Items.Count == 0)
             return BadRequest(new { error = "At least one item is required." });
         if (dto.Items.Any(i => i.UnitAmountCents <= 0 || i.Quantity <= 0))
@@ -25,13 +27,15 @@ public class TransactionsController : ControllerBase
         // ← Get the logged-in user id from session; null = guest
         var sessionUserId = HttpContext.Session.GetInt32("SessionUserId");
 
-        var items = dto.Items.Select(i => new TransactionItem
-        {
-            ProductId = i.ProductId,
-            Name = i.Name,
-            UnitAmountCents = i.UnitAmountCents,
-            Quantity = i.Quantity
-        }).ToList();
+        var items = dto
+            .Items.Select(i => new TransactionItem
+            {
+                ProductId = i.ProductId,
+                Name = i.Name,
+                UnitAmountCents = i.UnitAmountCents,
+                Quantity = i.Quantity,
+            })
+            .ToList();
 
         var tx = new Transaction
         {
@@ -40,7 +44,7 @@ public class TransactionsController : ControllerBase
             Currency = dto.Currency.ToUpperInvariant(),
             Address = dto.Address,
             CreatedAt = DateTime.UtcNow,
-            Items = items
+            Items = items,
         };
 
         _db.Transactions.Add(tx);
@@ -54,10 +58,11 @@ public class TransactionsController : ControllerBase
     public ActionResult<IEnumerable<TransactionDto>> GetMine()
     {
         var uid = HttpContext.Session.GetInt32("SessionUserId");
-        if (uid is null) return Unauthorized(new { error = "Login required." });
+        if (uid is null)
+            return Unauthorized(new { error = "Login required." });
 
-        var list = _db.Transactions
-            .AsNoTracking()
+        var list = _db
+            .Transactions.AsNoTracking()
             .Where(t => t.UserId == uid)
             .OrderByDescending(t => t.CreatedAt)
             .Include(t => t.Items)
@@ -71,13 +76,15 @@ public class TransactionsController : ControllerBase
     public ActionResult<IEnumerable<TransactionDto>> GetAll()
     {
         var uid = HttpContext.Session.GetInt32("SessionUserId");
-        if (uid is null) return Unauthorized(new { error = "Login required." });
+        if (uid is null)
+            return Unauthorized(new { error = "Login required." });
 
         var user = _db.Users.AsNoTracking().FirstOrDefault(u => u.Id == uid.Value);
-        if (user is null || !user.IsAdmin) return Forbid();
+        if (user is null || !user.IsAdmin)
+            return Forbid();
 
-        var list = _db.Transactions
-            .AsNoTracking()
+        var list = _db
+            .Transactions.AsNoTracking()
             .OrderByDescending(t => t.CreatedAt)
             .Include(t => t.Items)
             .ToList();
@@ -89,29 +96,33 @@ public class TransactionsController : ControllerBase
     [HttpGet("{id:int}")]
     public ActionResult<TransactionDto> GetById([FromRoute] int id)
     {
-        var tx = _db.Transactions
-            .AsNoTracking()
+        var tx = _db
+            .Transactions.AsNoTracking()
             .Include(t => t.Items)
             .FirstOrDefault(t => t.Id == id);
 
-        if (tx is null) return NotFound();
+        if (tx is null)
+            return NotFound();
         return Ok(ToDto(tx));
     }
 
-    private static TransactionDto ToDto(Transaction t) => new()
-    {
-        Id = t.Id,
-        UserId = t.UserId?.ToString(),
-        TotalCents = t.TotalCents,
-        Currency = t.Currency,
-        Address = t.Address,
-        CreatedAt = t.CreatedAt,
-        Items = t.Items.Select(i => new TransactionItemDto
+    private static TransactionDto ToDto(Transaction t) =>
+        new()
         {
-            ProductId = i.ProductId,
-            Name = i.Name,
-            UnitAmountCents = i.UnitAmountCents,
-            Quantity = i.Quantity
-        }).ToList()
-    };
+            Id = t.Id,
+            UserId = t.UserId?.ToString(),
+            TotalCents = t.TotalCents,
+            Currency = t.Currency,
+            Address = t.Address,
+            CreatedAt = t.CreatedAt,
+            Items = t
+                .Items.Select(i => new TransactionItemDto
+                {
+                    ProductId = i.ProductId,
+                    Name = i.Name,
+                    UnitAmountCents = i.UnitAmountCents,
+                    Quantity = i.Quantity,
+                })
+                .ToList(),
+        };
 }

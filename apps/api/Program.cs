@@ -1,11 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using Aroundtheway.Api.Data;
-using MySqlConnector;
-using Aroundtheway.Api.Services;
-using OpenAI.Chat;
-using Amazon.S3;
 using Amazon;
+using Amazon.S3;
+using Aroundtheway.Api.Data;
+using Aroundtheway.Api.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
+using OpenAI.Chat;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,14 +22,18 @@ builder.Services.AddSession(options =>
 builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
 
 // Configure OpenAI ChatClient
-var openAIApiKey = builder.Configuration["OpenAI:ApiKey"] ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY");
+var openAIApiKey =
+    builder.Configuration["OpenAI:ApiKey"] ?? Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 if (string.IsNullOrEmpty(openAIApiKey))
 {
-    throw new InvalidOperationException("OpenAI API key is not configured. Set OPENAI_API_KEY environment variable or add OpenAI:ApiKey to appsettings.json");
+    throw new InvalidOperationException(
+        "OpenAI API key is not configured. Set OPENAI_API_KEY environment variable or add OpenAI:ApiKey to appsettings.json"
+    );
 }
 builder.Services.AddSingleton(new ChatClient("gpt-4", openAIApiKey));
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+builder
+    .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
     {
         o.LoginPath = "/account/login";
@@ -55,7 +59,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 var awsConfig = new AmazonS3Config
 {
     ServiceURL = builder.Configuration["AWS:ServiceURL"],
-    ForcePathStyle = true
+    ForcePathStyle = true,
 };
 
 builder.Services.AddScoped<IAmazonS3>(provider =>
@@ -77,10 +81,7 @@ builder.Services.AddScoped<Supabase.Client>(provider =>
     var url = configuration["Supabase:Url"];
     var key = configuration["Supabase:Key"];
 
-    var options = new Supabase.SupabaseOptions
-    {
-        AutoConnectRealtime = false
-    };
+    var options = new Supabase.SupabaseOptions { AutoConnectRealtime = false };
 
     return new Supabase.Client(url, key, options);
 });
@@ -99,7 +100,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -131,7 +131,7 @@ app.MapGet(
             var request = new Amazon.S3.Model.ListObjectsV2Request
             {
                 BucketName = "product-images",
-                MaxKeys = 1
+                MaxKeys = 1,
             };
             var response = await s3Client.ListObjectsV2Async(request);
             return $"s3-ok: bucket accessible, {response.S3Objects.Count} objects sampled";

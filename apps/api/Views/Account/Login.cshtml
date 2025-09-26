@@ -4,7 +4,8 @@
     <div class="max-w-[420px] w-full">
         <h1 class="text-lg font-light uppercase tracking-[.15em] text-black text-center mb-8">Admin Login</h1>
 
-        <form method="post" action="/api/auth/login" class="space-y-6">
+        <form method="post" action="/account/login" class="space-y-6">
+            @Html.AntiForgeryToken()
             <div>
                 <label asp-for="Email" class="block text-xs font-light uppercase tracking-[.15em] text-black mb-2">
                     Email

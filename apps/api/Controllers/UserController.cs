@@ -1,14 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
 using Aroundtheway.Api.Data;
 using Aroundtheway.Api.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aroundtheway.Api.Controllers;
 
 [Route("user")]
-[Authorize(Policy = "AdminOnly")]
+// [Authorize(Policy = "AdminOnly")] // TEMP: Disabled for demo
 public class UserController : Controller
 {
     private readonly AppDbContext _context;
@@ -18,18 +17,13 @@ public class UserController : Controller
         _context = context;
     }
 
-
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
         var users = await _context.Users.ToListAsync();
 
-        var vm = new UsersViewModel
-        {
-            Users = users
-        };
+        var vm = new UsersViewModel { Users = users };
 
         return View(vm);
-
     }
 }

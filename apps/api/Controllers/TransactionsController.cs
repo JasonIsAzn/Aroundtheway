@@ -7,10 +7,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Aroundtheway.Api.Controllers;
 
 [Route("admin/transactions")]
-[Authorize(Policy = "AdminOnly")]
+// [Authorize(Policy = "AdminOnly")] // TEMP: Disabled for demo
 public class AdminTransactionsController : Controller
 {
     private readonly AppDbContext _db;
+
     public AdminTransactionsController(AppDbContext db) => _db = db;
 
     [HttpGet("")]
@@ -18,12 +19,13 @@ public class AdminTransactionsController : Controller
     {
         var uid = HttpContext.Session.GetInt32("SessionUserId");
 
+        // TEMP: Disabled admin check for demo
+        // var me = _db.Users.AsNoTracking().FirstOrDefault(u => u.Id == uid!.Value);
+        // if (me is null || !me.IsAdmin)
+        //     return Forbid();
 
-        var me = _db.Users.AsNoTracking().FirstOrDefault(u => u.Id == uid!.Value);
-        if (me is null || !me.IsAdmin) return Forbid();
-
-        var vms = _db.Transactions
-            .AsNoTracking()
+        var vms = _db
+            .Transactions.AsNoTracking()
             .OrderByDescending(t => t.CreatedAt)
             .Include(t => t.Items)
             .Select(t => new TransactionRowViewModel
@@ -34,13 +36,15 @@ public class AdminTransactionsController : Controller
                 Currency = t.Currency,
                 Address = t.Address,
                 CreatedAt = t.CreatedAt,
-                Items = t.Items.Select(i => new TransactionItemRowViewModel
-                {
-                    ProductId = i.ProductId,
-                    Name = i.Name,
-                    UnitAmountCents = i.UnitAmountCents,
-                    Quantity = i.Quantity
-                }).ToList()
+                Items = t
+                    .Items.Select(i => new TransactionItemRowViewModel
+                    {
+                        ProductId = i.ProductId,
+                        Name = i.Name,
+                        UnitAmountCents = i.UnitAmountCents,
+                        Quantity = i.Quantity,
+                    })
+                    .ToList(),
             })
             .ToList();
 
