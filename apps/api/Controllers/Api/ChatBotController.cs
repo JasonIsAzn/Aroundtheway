@@ -66,7 +66,7 @@ public class ChatBotController : ControllerBase
             };
 
 var chatCompletion = await _chatClient.CompleteChatAsync(openAIMessages);
-var botResponse = chatCompletion.Choices[0].Message.Content;
+var botResponse = chatCompletion.Value.Choices[0].Message.Content;
 
             // Save to database if user is logged in
             Models.ChatMessage? chatMessage = null;
