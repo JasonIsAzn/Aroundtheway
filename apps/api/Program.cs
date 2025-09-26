@@ -27,10 +27,7 @@ if (string.IsNullOrEmpty(openAIApiKey))
 {
     throw new InvalidOperationException("OpenAI API key is not configured. Set OPENAI_API_KEY environment variable or add OpenAI:ApiKey to appsettings.json");
 }
-var openai = new OpenAI.OpenAIClient(openAIApiKey);
-builder.Services.AddSingleton(openai);
-builder.Services.AddSingleton<ChatClient>(services => 
-    new ChatClient(services.GetRequiredService<OpenAI.OpenAIClient>(), "gpt-4"));
+builder.Services.AddSingleton(new ChatClient("gpt-4", openAIApiKey));
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
