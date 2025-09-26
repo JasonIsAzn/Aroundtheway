@@ -1,3 +1,4 @@
+
 html, body 
 {
     margin: 0;
@@ -28,6 +29,7 @@ html, body
     max-width: 5rem;      
     display: block;
     object-fit: contain; 
+     
 }
 .navBarContainer
 {
@@ -53,7 +55,11 @@ html, body
     text-decoration: none;
     color: black;
     letter-spacing: -1px;
-    font-size: 12px;
+    font-size: 13px;
+
+    font-family: "Lobster", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 
 }
 
@@ -66,7 +72,7 @@ html, body
     text-decoration: none;
     color: black;
     letter-spacing: -1px;
-    font-size: 12px;
+    font-size: 13px;
 }
 .navFooter
 {
@@ -106,8 +112,8 @@ html, body
 
     list-style: none;
     margin: 0;
-    padding: 0.25rem 1rem;
-    background-color: white;
+    /* CHANGING VERTICAL OF DROPDOWN */
+    padding: 2.2rem 1rem;
     border-radius: 4px;
     min-width: 14rem;
 
@@ -121,31 +127,16 @@ html, body
     line-height: 1.5;         /* makes vertical alignment cleaner */
     display: flex;
     align-items: center;      /* centers the text vertically inside each <a> */
-    gap: 2rem;
     display: flex;
     flex-direction: row; /* horizontal */
     gap: 2rem;  
     position: relative;
-    font-size: 12px;
+    font-size: 13px;
 }
 .hasDropdown > a {
   display: inline-flex;        /* turn the link into a flexbox */
   align-items: center;         /* vertically center text + arrow */
   gap: .5rem;                 /* space between word and arrow */
-}
-.dropdown a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0px;                /* slightly below text */
-  width: 0;
-  height: 2px;
-  background: black;    /* matches text color */
-  transition: width 0.3s ease;
-}
-
-.dropdown a:hover::after {
-  width: 100%;                 /* expands underline on hover */
 }
 
 .hasDropdown > a::after {
@@ -183,15 +174,12 @@ html, body
 }
   
   /* small touch: prevent submenu from hugging page edge on small screens */
-@media (max-width: 640px) 
-{
-    .dropdown 
-    {
-      left: -0.5rem;
-      right: auto;
-    }
-}
+
 .hasDropdown .dropdown 
 {
     left: -1rem; /* adjust until aligned exactly */
 }  
+.navFooter a:hover {
+  font-weight: bold;
+}
+

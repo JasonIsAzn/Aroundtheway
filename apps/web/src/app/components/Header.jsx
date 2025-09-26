@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import styles from "./Header.module.css";
 
+
+
 function Header() {
   const [logoSrc, setLogoSrc] = useState("/aroundthewayLogoA.png");
   const [me, setMe] = useState(null);
@@ -96,10 +98,10 @@ function Header() {
         <section className={styles.navFooterContainer}>
           <ul className={styles.navFooter}>
             <li>
-              <a href="/login">Login</a>
+              <a href="/login">LOGIN</a>
             </li>
             <li>
-              <a href="/register">Register</a>
+              <a href="/register">REGISTER</a>
             </li>
             <li>
               <a href="/checkout">BAG</a>
