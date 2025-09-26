@@ -5,93 +5,152 @@
     ViewData["Title"] = "Edit Post";
 }
 
-<h1 class="display-4">Edit Post</h1>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    sussie: {
+                        black: '#000000',
+                        white: '#FFFFFF',
+                    }
+                }
+            }
+        }
+    }
+</script>
 
-<div asp-validation-summary="All" class="form-text text-danger"></div>
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <h1 class="text-2xl font-semibold mb-6 text-black">Edit Post</h1>
 
-<div class="card shadow">
-    <form asp-action="UpdatePost" asp-controller="Post" asp-route-id="@ViewBag.PostId" method="post"
-        enctype="multipart/form-data">
-        @Html.AntiForgeryToken()
-        <div class="card-body">
+    <div asp-validation-summary="All" class="text-red-500 mb-6" role="alert"></div>
 
-            <div class="mb-3">
-                <label asp-for="ProductName" class="form-label">Product Name*:</label>
-                <input asp-for="ProductName" class="form-control" />
-                <span asp-validation-for="ProductName" class="form-text text-danger"></span>
-            </div>
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+        <form asp-action="UpdatePost" asp-controller="Post" asp-route-id="@ViewBag.PostId" method="post"
+            enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <div class="p-6 space-y-6">
+                <div class="relative">
+                    <label asp-for="ProductName" class="block text-sm font-medium text-black mb-2">Product Name*</label>
+                    <input asp-for="ProductName" 
+                           class="block w-full px-4 py-4 text-black bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors" />
+                    <span asp-validation-for="ProductName" class="text-red-500 text-sm mt-1"></span>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="Color" class="form-label">Color*:</label>
-                <input asp-for="Color" class="form-control" />
-                <span asp-validation-for="Color" class="form-text text-danger"></span>
-            </div>
+                <div class="relative">
+                    <label asp-for="Color" class="block text-sm font-medium text-black mb-2">Color*</label>
+                    <input asp-for="Color" 
+                           class="block w-full px-4 py-4 text-black bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors" />
+                    <span asp-validation-for="Color" class="text-red-500 text-sm mt-1"></span>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="Price" class="form-label">Price*:</label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="form-text text-danger"></span>
-            </div>
+                <div class="relative">
+                    <label asp-for="Price" class="block text-sm font-medium text-black mb-2">Price*</label>
+                    <input asp-for="Price" 
+                           class="block w-full px-4 py-4 text-black bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors" 
+                           type="number" 
+                           step="0.01" />
+                    <span asp-validation-for="Price" class="text-red-500 text-sm mt-1"></span>
+                </div>
 
-            <div class="mb-3">
-                <label asp-for="NumOfSmall" class="form-label">Number of Small Inventory:</label>
-                <input asp-for="NumOfSmall" class="form-control" />
-                <span asp-validation-for="NumOfSmall" class="form-text text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="NumOfMedium" class="form-label">Number of Medium Inventory:</label>
-                <input asp-for="NumOfMedium" class="form-control" />
-                <span asp-validation-for="NumOfMedium" class="form-text text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="NumOfLarge" class="form-label">Number of Large Inventory:</label>
-                <input asp-for="NumOfLarge" class="form-control" />
-                <span asp-validation-for="NumOfLarge" class="form-text text-danger"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="NumOfXLarge" class="form-label">Number of X-Large Inventory:</label>
-                <input asp-for="NumOfXLarge" class="form-control" />
-                <span asp-validation-for="NumOfXLarge" class="form-text text-danger"></span>
-            </div>
-
-            <!-- Existing images with remove checkboxes -->
-            @if (Model.ImageUrls is { Count: > 0 })
-            {
-                <div class="mb-4">
-                    <label class="form-label">Existing Images</label>
-                    <div class="row g-3">
-                        @for (int i = 0; i < Model.ImageUrls.Count; i++)
-                        {
-                            var url = Model.ImageUrls[i];
-                            <div class="col-6 col-md-4 col-lg-3">
-                                <div class="border rounded p-2">
-                                    <img src="@url" alt="Image @i" class="img-fluid mb-2" />
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="ImageUrlsToRemove" value="@url"
-                                            id="rm_@i" />
-                                        <label class="form-check-label" for="rm_@i">Remove</label>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+                <div class="space-y-4">
+                    <h5 class="text-lg font-semibold text-black">Inventory</h5>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label asp-for="NumOfSmall" class="block text-sm font-medium text-black mb-2">Small</label>
+                            <input asp-for="NumOfSmall" 
+                                   class="block w-full px-4 py-4 text-black bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors" 
+                                   type="number" 
+                                   min="0" />
+                            <span asp-validation-for="NumOfSmall" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+                        <div class="relative">
+                            <label asp-for="NumOfMedium" class="block text-sm font-medium text-black mb-2">Medium</label>
+                            <input asp-for="NumOfMedium" 
+                                   class="block w-full px-4 py-4 text-black bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors" 
+                                   type="number" 
+                                   min="0" />
+                            <span asp-validation-for="NumOfMedium" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+                        <div class="relative">
+                            <label asp-for="NumOfLarge" class="block text-sm font-medium text-black mb-2">Large</label>
+                            <input asp-for="NumOfLarge" 
+                                   class="block w-full px-4 py-4 text-black bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors" 
+                                   type="number" 
+                                   min="0" />
+                            <span asp-validation-for="NumOfLarge" class="text-red-500 text-sm mt-1"></span>
+                        </div>
+                        <div class="relative">
+                            <label asp-for="NumOfXLarge" class="block text-sm font-medium text-black mb-2">X-Large</label>
+                            <input asp-for="NumOfXLarge" 
+                                   class="block w-full px-4 py-4 text-black bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors" 
+                                   type="number" 
+                                   min="0" />
+                            <span asp-validation-for="NumOfXLarge" class="text-red-500 text-sm mt-1"></span>
+                        </div>
                     </div>
                 </div>
-            }
 
-            <!-- Add new images -->
-            <div class="mb-4">
-                <label class="form-label">Add Images (optional, up to 10 total per upload)</label>
-                <input type="file" name="Images" multiple accept="image/*" class="form-control" />
-                <span asp-validation-for="Images" class="form-text text-danger"></span>
+                <!-- Existing images with remove checkboxes -->
+                @if (Model.ImageUrls is { Count: > 0 })
+                {
+                    <div class="space-y-4">
+                        <h5 class="text-lg font-semibold text-black">Existing Images</h5>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                            {
+                                var url = Model.ImageUrls[i];
+                                <div class="relative bg-white rounded-lg shadow overflow-hidden">
+                                    <img src="@url" alt="Image @i" class="w-full h-48 object-cover" />
+                                    <div class="p-3">
+                                        <label class="inline-flex items-center">
+                                            <input type="checkbox" 
+                                                   name="ImageUrlsToRemove" 
+                                                   value="@url"
+                                                   id="rm_@i" 
+                                                   class="rounded border-gray-300 text-black focus:ring-black" />
+                                            <span class="ml-2 text-sm">Remove</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Add new images -->
+                <div class="space-y-4">
+                    <h5 class="text-lg font-semibold text-black">Add Images</h5>
+                    <div class="relative">
+                        <input type="file" 
+                               name="Images" 
+                               multiple 
+                               accept="image/*" 
+                               class="block w-full text-sm text-black
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-lg file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-black file:text-white
+                                      hover:file:bg-gray-900
+                                      border border-gray-200 rounded-lg" />
+                        <p class="mt-2 text-sm text-gray-500">Optional, up to 10 images per upload</p>
+                        <span asp-validation-for="Images" class="text-red-500 text-sm mt-1"></span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mt-6">
+                    <a href="javascript:history.back()" 
+                       class="px-6 py-3 bg-white text-black border border-black rounded-lg hover:bg-black hover:text-white transition-colors">
+                        Back
+                    </a>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-colors">
+                        Save Changes
+                    </button>
+                </div>
             </div>
-
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </div>
-
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
